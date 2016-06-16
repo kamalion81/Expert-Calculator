@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" 
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Расчет</title>
+    </h:head>
+    <h:body>
+        <h:form>
+
+            <p:growl id="growl" sticky="true" showDetail="true"/>
+
+            <p:wizard flowListener="#{CalcWizard.onFlowProcess}" nextLabel="Рассчитать">
+                <p:tab id="input" title="Данные">
+                    <p:panel header="Входящие данные">
+                        <p:panelGrid  style="margin-top:20px">
+                            
+                            <f:facet name="header">
+                                <p:row>
+                                    <p:column colspan="1">Наименование</p:column>
+                                    <p:column colspan="1">Обозначение</p:column>
+                                    <p:column colspan="1">Величина</p:column>
+                                </p:row>
+                            </f:facet>
+                            
+                            <p:row>
+                                <p:column>Материал обечайки</p:column>
+                                <p:column>Марка стали</p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.steel}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Расчетное внутреннее давление, МПа</p:column>
+                                
+                                <p:column>
+                                    <h:outputText value="#{Designations.getIntPressureDesignation()}"/>
+                                </p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.IntPressure}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>
+                                    <h:outputText value="#{Designations.getHydroPressureName()}"/>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{Designations.getHydroPressureDesignation()}"/>
+                                </p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.HydroPressure}" label="Марка стали"/>
+                                </p:column>
+                            </p:row>
+
+                        </p:panelGrid>
+                    </p:panel>
+                </p:tab>
+                <p:tab id="result" title="Результат">
+                    <p:panel header="Результаты расчетов">
+                    <p:panelGrid  style="margin-top:20px">
+                        
+                    </p:panelGrid>
+                        <p:commandButton value="Submit" actionListener="#{userWizard.save}" update="growl" process="@this"/>
+                        </p:panel>
+                </p:tab>
+            </p:wizard>
+        </h:form>
+    </h:body>
+</html>
+
