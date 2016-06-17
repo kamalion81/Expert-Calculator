@@ -38,25 +38,168 @@
                             <p:row>
                                 <p:column>Расчетное внутреннее давление, МПа</p:column>
                                 
+                                <p:column>P<sub>i</sub></p:column>
                                 <p:column>
-                                    <h:outputText value="#{Designations.getIntPressureDesignation()}"/>
-                                </p:column>
-                                <p:column>
-                                    <p:inputText value="#{CalcWizard.input.IntPressure}"/>
+                                    <p:inputText value="#{CalcWizard.input.intPressure}"/>
                                 </p:column>
                             </p:row>
                             
                             <p:row>
+                                <p:column>Давление гидроиспытаний, МПа</p:column>
+                                <p:column>P<sub>H</sub></p:column>
                                 <p:column>
-                                    <h:outputText value="#{Designations.getHydroPressureName()}"/>
-                                </p:column>
-                                <p:column>
-                                    <h:outputText value="#{Designations.getHydroPressureDesignation()}"/>
-                                </p:column>
-                                <p:column>
-                                    <p:inputText value="#{CalcWizard.input.HydroPressure}" label="Марка стали"/>
+                                    <p:inputText value="#{CalcWizard.input.hydroPressure}"/>
                                 </p:column>
                             </p:row>
+                            
+                            <p:row>
+                                <p:column>Расчетная температура, <sup>o</sup>C</p:column>
+                                <p:column>T</p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.temp}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Допускаемое напряжение при расчетной
+                                    <br></br>температуре Т <sup>o</sup>С, МПа
+                                </p:column>
+                                <p:column>[&sigma;]<sup>T</sup></p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.tempT}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Допускаемое напряжение при расчетной 
+                                    <br></br>температуре 20 <sup>o</sup>С, МПа
+                                </p:column>
+                                <p:column>[&sigma;]<sup>20</sup></p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.temp20}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Внутренний диаметр цилиндрической 
+                                    <br></br>обечайки, мм
+                                </p:column>
+                                <p:column>D</p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.diam}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Номинальная исполнительная (или
+                                    <br></br>минимально измеренная) толщина
+                                    <br></br>стенки цилиндрической обечайки, мм
+                                </p:column>
+                                <p:column>S</p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.thickness}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Прибавка на коррозию и эрозию, мм</p:column>
+                                <p:column>c<sub>1</sub></p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.corrosion}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Прибавка на минусовый допуск, мм</p:column>
+                                <p:column>c<sub>2</sub></p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.minusTolerance}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Прибавка технологическая, мм</p:column>
+                                <p:column>c<sub>3</sub></p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.techno}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Суммарная прибавка к толщине стенке
+                                    <br></br>цилиндрической обечайки, мм</p:column>
+                                <p:column>C = c<sub>1</sub>+c<sub>2</sub>+c<sub>3</sub></p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.addThickness}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Коэффициент линейного расширения  
+                                    <br></br>(указывается марка стали) при Т <sup>o</sup>С, 1/<sup>o</sup>С</p:column>
+                                <p:column>&alpha;</p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.lineExpCoeff}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Модуль упругости (указывается марка   
+                                    <br></br>стали) при Т <sup>o</sup>С, МПа</p:column>
+                                <p:column>E</p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.elasticity}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Предел текучести для стали (указывается   
+                                    <br></br>марка стали)  при температуре Т <sup>o</sup>С, МПа</p:column>
+                              <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {R}^{\tiny T}_{\tiny p\;\tiny 02}"></img>
+                                </p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.yieldStrength}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Временное сопротивление для стали 
+                                    <br></br>(указывается марка стали) при 
+                                    <br></br> температуре Т <sup>o</sup>С, МПа
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {R}^{\tiny T}_{\tiny m}"></img>
+                                </p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.tempResist}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Предел текучести для стали (указывается 
+                                    <br></br>марки стали)  при температуре 20 <sup>o</sup>С,
+                                    <br></br> МПа
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {R}^{\tiny 20}_{\tiny p\;\tiny 02}"></img>
+                                </p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.yieldStrength20}"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Коэффициент прочности сварного шва</p:column>
+                                <p:column>&lambda;</p:column>
+                                <p:column>
+                                    <p:inputText value="#{CalcWizard.input.weld}"/>
+                                </p:column>
+                            </p:row>
+
+                            
+                            
+                            
 
                         </p:panelGrid>
                     </p:panel>
