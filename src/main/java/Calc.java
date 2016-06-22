@@ -2,28 +2,28 @@ import java.io.Serializable;
  
 public class Calc implements Serializable {
  
-    private int steel;
-    private int intPressure;
-    private int hydroPressure;
-    private int temp;
-    private int tempT;
-    private int temp20;
-    private int diam;
-    private int thickness;
-    private int corrosion;
-    private int minusTolerance;
-    private int techno;
-    private int addThickness;
-    private int lineExpCoeff;
-    private int elasticity;
-    private int yieldStrength;
-    private int tempResist;
-    private int yieldStrength20;
-    private int weld;
-    private int bending;
-    private int shift;
-    private int force;
-    private int calcThickness;
+    private Integer steel;
+    private Integer intPressure;
+    private Integer hydroPressure;
+    private Integer temp;
+    private Integer tempT;
+    private Integer temp20;
+    private Integer diam;
+    private Integer thickness;
+    private Integer corrosion;
+    private Integer minusTolerance;
+    private Integer techno;
+    private Integer addThickness;
+    private Integer lineExpCoeff;
+    private Integer elasticity;
+    private Integer yieldStrength;
+    private Integer tempResist;
+    private Integer yieldStrength20;
+    private Integer weld;
+    private Integer bending;
+    private Integer shift;
+    private Integer force;
+    private Integer calcThickness;
     private String greaterPressure;
     private String greaterThickness;
     
@@ -35,308 +35,308 @@ public class Calc implements Serializable {
     /**
      * @return the steel
      */
-    public int getSteel() {
+    public Integer getSteel() {
         return steel;
     }
 
     /**
      * @param steel the steel to set
      */
-    public void setSteel(int steel) {
+    public void setSteel(Integer steel) {
         this.steel = steel;
     }
 
     /**
      * @return the intPressure
      */
-    public int getIntPressure() {
+    public Integer getIntPressure() {
         return intPressure;
     }
 
     /**
      * @param intPressure the intPressure to set
      */
-    public void setIntPressure(int intPressure) {
+    public void setIntPressure(Integer intPressure) {
         this.intPressure = intPressure;
     }
 
     /**
      * @return the hydroPressure
      */
-    public int getHydroPressure() {
+    public Integer getHydroPressure() {
         return hydroPressure;
     }
 
     /**
      * @param hydroPressure the hydroPressure to set
      */
-    public void setHydroPressure(int hydroPressure) {
+    public void setHydroPressure(Integer hydroPressure) {
         this.hydroPressure = hydroPressure;
     }
 
     /**
      * @return the temp
      */
-    public int getTemp() {
+    public Integer getTemp() {
         return temp;
     }
 
     /**
      * @param temp the temp to set
      */
-    public void setTemp(int temp) {
+    public void setTemp(Integer temp) {
         this.temp = temp;
     }
 
     /**
      * @return the tempT
      */
-    public int getTempT() {
+    public Integer getTempT() {
         return tempT;
     }
 
     /**
      * @param tempT the tempT to set
      */
-    public void setTempT(int tempT) {
+    public void setTempT(Integer tempT) {
         this.tempT = tempT;
     }
 
     /**
      * @return the temp20
      */
-    public int getTemp20() {
+    public Integer getTemp20() {
         return temp20;
     }
 
     /**
      * @param temp20 the temp20 to set
      */
-    public void setTemp20(int temp20) {
+    public void setTemp20(Integer temp20) {
         this.temp20 = temp20;
     }
 
     /**
      * @return the diam
      */
-    public int getDiam() {
+    public Integer getDiam() {
         return diam;
     }
 
     /**
      * @param diam the diam to set
      */
-    public void setDiam(int diam) {
+    public void setDiam(Integer diam) {
         this.diam = diam;
     }
 
     /**
      * @return the thickness
      */
-    public int getThickness() {
+    public Integer getThickness() {
         return thickness;
     }
 
     /**
      * @param thickness the thickness to set
      */
-    public void setThickness(int thickness) {
+    public void setThickness(Integer thickness) {
         this.thickness = thickness;
     }
 
     /**
      * @return the corrosion
      */
-    public int getCorrosion() {
+    public Integer getCorrosion() {
         return corrosion;
     }
 
     /**
      * @param corrosion the corrosion to set
      */
-    public void setCorrosion(int corrosion) {
+    public void setCorrosion(Integer corrosion) {
         this.corrosion = corrosion;
     }
 
     /**
      * @return the minusTolerance
      */
-    public int getMinusTolerance() {
+    public Integer getMinusTolerance() {
         return minusTolerance;
     }
 
     /**
      * @param minusTolerance the minusTolerance to set
      */
-    public void setMinusTolerance(int minusTolerance) {
+    public void setMinusTolerance(Integer minusTolerance) {
         this.minusTolerance = minusTolerance;
     }
 
     /**
      * @return the techno
      */
-    public int getTechno() {
+    public Integer getTechno() {
         return techno;
     }
 
     /**
      * @param techno the techno to set
      */
-    public void setTechno(int techno) {
+    public void setTechno(Integer techno) {
         this.techno = techno;
     }
 
     /**
      * @return the addThickness
      */
-    public int getAddThickness() {
+    public Integer getAddThickness() {
         return addThickness;
     }
 
     /**
      * @param addThickness the addThickness to set
      */
-    public void setAddThickness(int addThickness) {
+    public void setAddThickness(Integer addThickness) {
         this.addThickness = addThickness;
     }
 
     /**
      * @return the lineExpCoeff
      */
-    public int getLineExpCoeff() {
+    public Integer getLineExpCoeff() {
         return lineExpCoeff;
     }
 
     /**
      * @param lineExpCoeff the lineExpCoeff to set
      */
-    public void setLineExpCoeff(int lineExpCoeff) {
+    public void setLineExpCoeff(Integer lineExpCoeff) {
         this.lineExpCoeff = lineExpCoeff;
     }
 
     /**
      * @return the elasticity
      */
-    public int getElasticity() {
+    public Integer getElasticity() {
         return elasticity;
     }
 
     /**
      * @param elasticity the elasticity to set
      */
-    public void setElasticity(int elasticity) {
+    public void setElasticity(Integer elasticity) {
         this.elasticity = elasticity;
     }
 
     /**
      * @return the yieldStrength
      */
-    public int getYieldStrength() {
+    public Integer getYieldStrength() {
         return yieldStrength;
     }
 
     /**
      * @param yieldStrength the yieldStrength to set
      */
-    public void setYieldStrength(int yieldStrength) {
+    public void setYieldStrength(Integer yieldStrength) {
         this.yieldStrength = yieldStrength;
     }
 
     /**
      * @return the tempResist
      */
-    public int getTempResist() {
+    public Integer getTempResist() {
         return tempResist;
     }
 
     /**
      * @param tempResist the tempResist to set
      */
-    public void setTempResist(int tempResist) {
+    public void setTempResist(Integer tempResist) {
         this.tempResist = tempResist;
     }
 
     /**
      * @return the yieldStrength20
      */
-    public int getYieldStrength20() {
+    public Integer getYieldStrength20() {
         return yieldStrength20;
     }
 
     /**
      * @param yieldStrength20 the yieldStrength20 to set
      */
-    public void setYieldStrength20(int yieldStrength20) {
+    public void setYieldStrength20(Integer yieldStrength20) {
         this.yieldStrength20 = yieldStrength20;
     }
 
     /**
      * @return the weld
      */
-    public int getWeld() {
+    public Integer getWeld() {
         return weld;
     }
 
     /**
      * @param weld the weld to set
      */
-    public void setWeld(int weld) {
+    public void setWeld(Integer weld) {
         this.weld = weld;
     }
 
     /**
      * @return the bending
      */
-    public int getBending() {
+    public Integer getBending() {
         return bending;
     }
 
     /**
      * @param bending the bending to set
      */
-    public void setBending(int bending) {
+    public void setBending(Integer bending) {
         this.bending = bending;
     }
 
     /**
      * @return the shift
      */
-    public int getShift() {
+    public Integer getShift() {
         return shift;
     }
 
     /**
      * @param shift the shift to set
      */
-    public void setShift(int shift) {
+    public void setShift(Integer shift) {
         this.shift = shift;
     }
 
     /**
      * @return the force
      */
-    public int getForce() {
+    public Integer getForce() {
         return force;
     }
 
     /**
      * @param force the force to set
      */
-    public void setForce(int force) {
+    public void setForce(Integer force) {
         this.force = force;
     }
 
     /**
      * @return the calcThickness
      */
-    public int getCalcThickness() {
+    public Integer getCalcThickness() {
         return calcThickness;
     }
 
     /**
      * @param calcThickness the calcThickness to set
      */
-    public void setCalcThickness(int calcThickness) {
+    public void setCalcThickness(Integer calcThickness) {
         this.calcThickness = calcThickness;
     }
 

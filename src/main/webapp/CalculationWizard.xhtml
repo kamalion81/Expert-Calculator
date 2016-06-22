@@ -13,10 +13,9 @@
 
             <p:growl id="growl" sticky="true" showDetail="true"/>
 
-            <p:wizard flowListener="#{calcWizard.onFlowProcess}" nextLabel="Рассчитать" backLabel="Назад">
+            <p:wizard  nextLabel="Рассчитать" backLabel="Назад">
                 <p:tab id="input" title="Данные">
                     <p:panel header="Входящие данные">
-                        <p:messages />
                         <p:panelGrid  style="margin-top:20px">
                             
                             <f:facet name="header">
@@ -31,7 +30,8 @@
                                 <p:column>Материал обечайки</p:column>
                                 <p:column>Марка стали</p:column>
                                 <p:column>
-                                    <p:inputText value="#{calcWizard.calc.steel}"/>
+                                    <p:inputText id="steel" value="#{calcWizard.calc.steel}" required="true" label="Материал обечайки"/>
+                                    <p:message for="steel"/>
                                 </p:column>
                             </p:row>
                             
@@ -40,7 +40,8 @@
                                 
                                 <p:column>P<sub>i</sub></p:column>
                                 <p:column>
-                                    <p:inputText value="#{calcWizard.calc.intPressure}"/>
+                                    <p:inputText id="intPressure" value="#{calcWizard.calc.intPressure}" required="true" label="Расчетное внутреннее давление"/>
+                                    <p:message for="intPressure"/>
                                 </p:column>
                             </p:row>
                             
