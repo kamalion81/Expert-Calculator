@@ -14,13 +14,12 @@
             <p:panel header="Вход в систему">
                 <h:panelGrid columns="2" columnClasses="label, value">
                     <h:outputText value="Логин: " />
-                    <p:inputText value="#{LogPass.inputLogin}" required="true" label="Логин"/>
+                    <p:inputText value="#{loginController.login}" required="true" label="Логин"/>
  
                     <h:outputText value="Пароль: " />
-                    <p:password value="#{LogPass.inputPassword}" required="true" label="Пароль"/>
+                    <p:password value="#{loginController.password}" required="true" label="Пароль"/>
                     
-                    <p:commandButton value="Войти" action="authorize"/>
- 
+                    <h:commandButton value="Войти" action="#{loginController.verifyUser()}"/>
                 </h:panelGrid>
             </p:panel>
         </h:form>
