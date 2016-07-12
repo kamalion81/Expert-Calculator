@@ -2,6 +2,7 @@
 import java.io.Serializable;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
 import org.primefaces.event.FlowEvent;
 
 /**
@@ -19,7 +20,7 @@ public class CalcWizard implements Serializable {
     public Calc getCalc() {
         return calc;
     }
-
+    
     public void setCalc(Calc calc) {
         this.calc = calc;
     }

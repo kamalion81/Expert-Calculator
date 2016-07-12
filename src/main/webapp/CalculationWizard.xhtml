@@ -9,7 +9,7 @@
     <h:head>
         <title>Расчет</title>
     </h:head>
-    <h:form>
+    <h:form style="width: 700px">
 
         <p:growl id="growl" sticky="true" showDetail="true"/>
 
@@ -31,7 +31,7 @@
                             <p:column>Материал обечайки</p:column>
                             <p:column>Марка стали</p:column>
                             <p:column>
-                                <p:inputText id="steel" value="#{calcWizard.calc.steel}" required="true" label="Материал обечайки"/>
+                                <p:inputText style="color: yellow; background: teal" id="steel" value="#{calcWizard.calc.steel}" required="true" label="Материал обечайки"/>
                                 <p:message for="steel"/>
                             </p:column>
                         </p:row>

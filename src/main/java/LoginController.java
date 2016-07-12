@@ -1,7 +1,10 @@
 import java.io.Serializable;
+import java.sql.*;
+import javax.annotation.Resource;
 import javax.faces.bean.ManagedBean;
 import javax.faces.event.ActionEvent;
 import javax.faces.bean.ViewScoped;
+import javax.sql.DataSource;
 
 /**
  *
@@ -11,12 +14,29 @@ import javax.faces.bean.ViewScoped;
 @ViewScoped
 public class LoginController implements Serializable{
     
+    @Resource(name = "jdbc/usersdb")
+    private DataSource ds;
+    
+    
     private String login;
     private String password;
     
     
     public String verifyUser(){
-        return "CalculationWizard";
+        try {
+            Connection dbConnection = ds.getConnection();
+            Statement statement = dbConnection.createStatement();
+            ResultSet result = statement.executeQuery("SELECT * FROM javadb.users");
+ 
+                // выполнить SQL запрос
+        while(result.next()){
+            System.out.println(result.getString("worker"));
+        }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        
+        return "done";
         
     }
 
