@@ -1,3 +1,5 @@
+package beans;
+
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -48,7 +50,6 @@ public class Calc implements Serializable {
     private Double resShearForceElasticity;
     private Double resShearForcePermissible;
     private Double resStrengthConditionsShearForce;
-    
 
     /**
      * @return the steel

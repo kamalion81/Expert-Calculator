@@ -6,20 +6,22 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core" 
       xmlns:c="http://java.sun.com/jsp/jstl/core"
       xmlns:p="http://primefaces.org/ui" >
+    
     <h:head>
         <title>Авторизация</title>
     </h:head>
     <h:body>
         <h:form>
+            <p:growl id="growl" sticky="true" showDetail="true" life="3000" />
             <p:panel header="Вход в систему">
                 <h:panelGrid columns="2" columnClasses="label, value">
                     <h:outputText value="Логин: " />
-                    <p:inputText value="#{loginController.login}" required="true" label="Логин"/>
+                    <p:inputText value="#{userDAO.username}" required="true" label="Логин"/>
  
                     <h:outputText value="Пароль: " />
-                    <p:password value="#{loginController.password}" required="true" label="Пароль"/>
+                    <p:password value="#{userDAO.pass}" required="true" label="Пароль"/>
                     
-                    <h:commandButton value="Войти" action="#{loginController.verifyUser()}"/>
+                    <p:commandButton value="Войти"  ajax="false" update="growl" action="#{userDAO.login}"/>
                 </h:panelGrid>
             </p:panel>
         </h:form>

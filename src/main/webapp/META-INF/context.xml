@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context>
-    antiJARLocking="true" path="/expert";
-    
+<Context antiJARLocking="true" path="/expert">
     <Resource name="jdbc/usersdb" auth="Container" type="javax.sql.DataSource"
-               maxActive="100" maxIdle="30" maxWait="10000"
-               username="kamalion" password="parol" driverClassName="com.mysql.jdbc.Driver"
-               url="jdbc:mysql://localhost:3306/javadb"/>
+        maxActive="100" maxIdle="30" maxWait="10000"
+        username="kamalion" password="parol" driverClassName="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://DESKTOP-77AKSEI/calculator"/>
+</Context>
     
-</Context> 
+    
+
+
