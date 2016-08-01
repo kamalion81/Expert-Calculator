@@ -12,24 +12,51 @@
     <h:body>
         <h:form>
 
-            <p:dataTable var="steels" value="#{materials}">
+            <p:dataTable var="steel" value="#{steelsBean.lazyModel}" editable="true" paginator="true" rows="10" lazy="true">
 
                 <f:facet name="header">
                     Показатели марок стали
                 </f:facet>
-                <p:column headerText="Марка стали">
-                    <h:outputText value="#{materials}" />
-                </p:column>
-
-                <p:column headerText="Допускаемое напряжение">
-                    <h:outputText value="#{materials}" />
+                
+                <p:column headerText="id" rendered="false">
+                    <h:outputText value="#{steel.id}" />
                 </p:column>
                 
-                <p:column headerText="Предел текучести">
-                    <h:outputText value="#{materials}" />
+                <p:column headerText="Марка стали">
+                    <h:outputText value="#{steel.mark}" />
+                </p:column>
+
+                <p:column headerText="Допускаемое напряжение, 20">
+                    <h:outputText value="#{steel.sigma20}" />
+                </p:column>
+                
+                <p:column headerText="Допускаемое напряжение, T">
+                    <h:outputText value="#{steel.sigmaT}" />
                 </p:column>
                 
             </p:dataTable>
+            <p:panelGrid columns="2">
+                <p:commandButton value="Добавить" onclick="PF('dlg').show();"/>
+                <p:commandButton value="Удалить" ajax="false" action="#{steelDAO.deleteSteels()}"/>
+            </p:panelGrid>
+            
+             <p:dialog header="Новый пользователь" widgetVar="dlg" resizable="false">
+                <h:panelGrid columns="2" cellpadding="5">
+                    <h:outputLabel for="mark" value="Марка стали:" />
+                    <p:inputText id="mark" value="#{steelDAO.mark}" required="true" label="Марка стали"/>
+
+                    
+                    <h:outputLabel for="sigma20" value="Допускаемое напряжение, 20:"/>
+                    <p:inputText value="#{steelDAO.sigma20}" required="true" label="Допускаемое напряжение"/>
+                    
+                    <h:outputLabel for="sigmaT" value="Допускаемое напряжение, T"/>
+                    <p:inputText value="#{steelDAO.sigmaT}" required="true" label="Допускаемое напряжение"/>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Сохранить" update="growl" ajax="false" actionListener="#{steelDAO.saveMark}"/>
+                    </f:facet>  
+                </h:panelGrid>
+            </p:dialog>
         </h:form>
     </h:body>
 </html>

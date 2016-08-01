@@ -1,5 +1,6 @@
 package beans;
 
+import profiles.UserProfile;
 import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
@@ -21,24 +22,24 @@ import org.primefaces.event.RowEditEvent;
 @ManagedBean
 @ViewScoped
 public class UsersBean implements Serializable{
-    private LazyDataModel<UserProfile> lazyModel;
+//    private LazyDataModel<UserProfile> lazyModel;
+    private List<UserProfile> users;
+    private UserProfile selectedUser;
+    private String currentPass;
     
     @ManagedProperty("#{userDAO}")
     private UserDAO profile;
     
 
-    /**
-     * @return the lazyModel
-     */
-//    @PostConstruct
-//    public void init() throws SQLException {
+    @PostConstruct
+    public void init() {
+        users = profile.getUsers();
 //        lazyModel = new LazyUserDataModel(profile.getUsers());
-//    }
-    
-    public LazyDataModel<UserProfile> getLazyModel() throws SQLException,NamingException {
-        lazyModel = new LazyUserDataModel(profile.getUsers());
-        return lazyModel;
     }
+    
+//    public LazyDataModel<UserProfile> getLazyModel(){
+//        return lazyModel;
+//    }
 
     /**
      * @param profile the profile to set
@@ -48,12 +49,13 @@ public class UsersBean implements Serializable{
     }
     
     public void onRowEdit(RowEditEvent event) {
-        FacesMessage msg = new FacesMessage("Данные сохранены","sdsdsdsd");
+        profile.editUser(selectedUser);
+        FacesMessage msg = new FacesMessage("Данные сохранены","Пользователь "+selectedUser.getUsername());
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 
     public void onRowCancel(RowEditEvent event) {
-        FacesMessage msg = new FacesMessage("Редактирование отменено","fgfgftr");
+        FacesMessage msg = new FacesMessage("Редактирование отменено","Пользователь "+selectedUser.getUsername());
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 
@@ -67,47 +69,60 @@ public class UsersBean implements Serializable{
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }
     }
-   
+
+    /**
+     * @return the selectedUser
+     */
+    public UserProfile getSelectedUser() {
+        return selectedUser;
+    }
+
+    /**
+     * @param selectedUser the selectedUser to set
+     */
+    public void setSelectedUser(UserProfile selectedUser) {
+        this.selectedUser = selectedUser;
+    }
     
-    public void saveUser(){
+
+    /**
+     * @return the users
+     */
+    public List<UserProfile> getUsers() {
+        return users;
+    }
+    
+    public void deleteUsers(){
+        profile.deleteUser(selectedUser);
+        setUsers(profile.getUsers());
+        FacesMessage msg = new FacesMessage("Удаление пользователя","Пользователь "+selectedUser.getUsername());
+        FacesContext.getCurrentInstance().addMessage(null, msg);
         
         
     }
     
+    public void saveUser(){
+        profile.saveUser();
+        setUsers(profile.getUsers());
+        
+    }
+
+    /**
+     * @param users the users to set
+     */
+    public void setUsers(List<UserProfile> users) {
+        this.users = users;
+    }
+    
+    public String getCurrentPass(){
+        currentPass =  profile.getPassDt(selectedUser);
+        return currentPass;
+    }
+    
+    public void savePass(){
+        profile.savePass(selectedUser);
+        setUsers(profile.getUsers());
+    }
     
 }
     
-//   private DataSource ds;
-//   private String name;
-//   private String role;
-//   
-//   public UsersBean() throws NamingException{
-//       InitialContext initContext = new InitialContext();
-//        this.ds = (DataSource) initContext.lookup("java:comp/env/jdbc/usersdb");
-//    
-//}
-//   
-//   public ArrayList<UsersBean> getUsers(){
-//       return UserDAO.getUser();
-//      Connection conn = getDs().getConnection() throw SQLException;
-//      try {
-//         Statement stmt = conn.createStatement();        
-//         ResultSet result = stmt.executeQuery("SELECT name, role FROM calculator.users");  
-//         
-////          return ResultSupport.toResult(result);
-//         CachedRowSet crs = new com.sun.rowset.CachedRowSetImpl();         
-//            // or use an implementation from your database vendor
-//         crs.populate(result);
-//         return crs;
-//      } finally {
-//         conn.close();
-//      }
-//   }
-//
-//    /**
-//     * @return the ds
-//     */
-//    public DataSource getDs() {
-//        return ds;
-//    }
-//}

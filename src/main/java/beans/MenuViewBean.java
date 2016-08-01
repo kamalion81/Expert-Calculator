@@ -16,7 +16,7 @@ import org.primefaces.model.menu.MenuModel;
  * @author Kamalion
  */
 @ManagedBean
-public class MenuView {
+public class MenuViewBean {
     private MenuModel model;
     
     @PostConstruct

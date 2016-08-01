@@ -13,18 +13,23 @@
     <h:body>
         
         <h:form id="form">
-            <p:growl id="growl" showDetail="true"/>
-            <p:panelGrid columns="1">
-                <p:dataTable var="user" value="#{usersBean.lazyModel}" editable="true" paginator="true" rows="10" lazy="true">
+            <p:growl id="growl" showDetail="false"/>
+            <p:dataTable id="usersDt" var="user" value="#{usersBean.users}" editable="true" lazy="true"
+                         paginator="true" rows="10" selectionMode="single" selection="#{usersBean.selectedUser}" rowKey="#{user.id}">
 
                     <f:facet name="header">
                         Список пользователей
+                        <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-user-plus" label="Новый пользователь" onclick="PF('dlg').show();"/>
+                        <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-times-circle" update="growl" ajax="false" actionListener="#{usersBean.deleteUsers}" label="Удалить пользователей"/>
+                        <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-exchange" onclick="PF('dlg2').show();" label="Сменить пароль"/>
                     </f:facet>
+                    
+                    
 
-                    <p:ajax event="rowEdit" listener="#{usersBean.onRowEdit}" update=":form:growl" />
-                    <p:ajax event="rowEditCancel" listener="#{usersBean.onRowCancel}" update=":form:growl" />
+                    <p:ajax event="rowEdit" process="@this" listener="#{usersBean.onRowEdit}" update=":form:growl" />
+                    <p:ajax event="rowEditCancel" process="@this" listener="#{usersBean.onRowCancel}" update=":form:growl" />
 
-                    <p:column headerText="id" rendered="false">
+                    <p:column headerText="Код">
                         <h:outputText value="#{user.id}" />
                     </p:column>
 
@@ -39,7 +44,7 @@
                         <p:cellEditor>
                             <f:facet name="output"><h:outputText value="#{user.rolename}"/></f:facet>
                             <f:facet name="input">
-                                <h:selectOneMenu value="#{user.rolename}" style="width:100%">
+                                <h:selectOneMenu required="false" value="#{user.rolename}" style="width:100%">
                                     <f:selectItems value="#{userDAO.roles}" var="roles" itemLabel="#{roles}" itemValue="#{roles}" />
                                 </h:selectOneMenu>
                             </f:facet>
@@ -54,33 +59,48 @@
 
 
                 </p:dataTable>
-                <p:commandButton value="Добавить" onclick="PF('dlg').show();"/>
-
-            </p:panelGrid>
-            
+                
             
             <p:dialog header="Новый пользователь" widgetVar="dlg" resizable="false">
                 <h:panelGrid columns="2" cellpadding="5">
                     <h:outputLabel for="username" value="ФИО пользователя:" />
-                    <p:inputText id="username" value="#{userDAO.username}" required="true" label="ФИО" />
+                    <p:inputText id="username" value="#{userDAO.username}" required="false" label="ФИО" />
 
                     <h:outputLabel for="role" value="Роль:" />
                     
-                    <h:selectOneMenu value="#{userDAO.rolename}" style="width:100%">
+                    <h:selectOneMenu required="false" value="#{userDAO.rolename}" style="width:100%">
                         <f:selectItems value="#{userDAO.roles}" var="roles" itemLabel="#{roles}" itemValue="#{roles}" />
                     </h:selectOneMenu>
                     
                     <h:outputLabel for="pass" value="Пароль:"/>
-                    <p:password value="#{userDAO.pass}" required="true" label="Пароль"/>
+                    <p:password value="#{userDAO.pass}" required="false" label="Пароль"/>
                     
                     <h:outputLabel for="pass_again" value="Повтор пароля:"/>
-                    <p:password value="#{userDAO.pass_again}" required="true" label="Повторение пароля"/>
+                    <p:password value="#{userDAO.pass_again}" required="false" label="Повторение пароля"/>
 
                     <f:facet name="footer">
-                        <p:commandButton value="Сохранить" update="growl" ajax="false" actionListener="#{userDAO.saveUser}"/>
+                        <p:commandButton  value="Сохранить" update="growl" ajax="false" action="#{usersBean.saveUser}"/>
                     </f:facet>  
                 </h:panelGrid>
             </p:dialog>
+            
+             <p:dialog header="Смена пароля" widgetVar="dlg2" resizable="false">
+                <h:panelGrid columns="2" columnClasses="label, value">
+                    <h:outputLabel for="old" value="Прежний пароль: " />
+                    <p:password id="old" value="#{userDAO.oldPass}" label="Прежний пароль"/>
+                    
+                    <h:outputLabel for="pwd1" value="Новый пароль: " />
+                    <p:password id="pwd1" value="#{userDAO.newPass}"  label="Новый пароль"/>
+
+                    <h:outputLabel for="pwd2" value="Повтор пароля: " />
+                    <p:password id="pwd2" value="#{userDAO.newPass_again}" label="Повтор пароля"/>
+                    
+                    <p:commandButton value="Применить" ajax="false" update="growl" action="#{usersBean.savePass}"/>
+ 
+                </h:panelGrid>
+            </p:dialog>
+            
+            
             
             
         </h:form>

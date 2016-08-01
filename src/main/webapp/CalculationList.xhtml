@@ -11,12 +11,23 @@
     </h:head>
     <h:body>
         <h:form>
-            <p:dataList value="#{dataListCalculation.calcs}" var="calc" type="ordered" itemType="none" paginator="true" rows="20" styleClass="paginated">
+            <p:dataTable value="#{calcsBean.lazyModel}" var="calc" paginator="true" rows="20" styleClass="paginated" lazy="true">
                 <f:facet name="header">
                     Список расчетов
                 </f:facet>
-                <h:outputText value="#{calc.name}" style="display:inline-block"/>
-            </p:dataList>
+                
+                <p:column headerText="id" rendered="false">
+                    <h:outputText value="#{calc.id}" style="display:inline-block"/>
+                </p:column>
+                
+                <p:column headerText="Дата">
+                    <h:outputText value="#{calc.date}" style="display:inline-block"/>
+                </p:column>
+                
+                <p:column headerText="Расчет">
+                    <h:outputText value="#{calc.name}" style="display:inline-block"/>
+                </p:column>
+            </p:dataTable>>
         </h:form>
 
     </h:body>

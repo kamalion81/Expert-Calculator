@@ -1,10 +1,12 @@
-
 package dao;
 
+import profiles.UserProfile;
 import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.event.ActionEvent;
@@ -17,74 +19,90 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.RowEditEvent;
 
-
 /**
  *
  * @author Kamalion
  */
 @ManagedBean
 @ApplicationScoped
-public class UserDAO implements Serializable{
-    
+public class UserDAO implements Serializable {
+
     private String username;
     private String rolename;
     private String pass;
     private String pass_again;
-    private DataSource ds;
-    private Connection dbConnection;
+    private String oldPass;
+    private String newPass;
+    private String newPass_again;
     private boolean loggedIn;
-     
-     public UserDAO() throws NamingException,SQLException{
-         
-         InitialContext initContext = new InitialContext();
-         ds = (DataSource) initContext.lookup("java:comp/env/jdbc/usersdb");
-         
-     }
-     
-     
-     private Statement getStatement() throws NamingException,SQLException{
-         
-         if (ds == null) {
-            throw new SQLException("No data source");
+    private UserProfile selectedUser;
+    private DataSource ds;
+
+    public UserDAO() {
+
+        InitialContext initContext = null;
+        try {
+            initContext = new InitialContext();
+        } catch (NamingException ex) {
+            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
-        dbConnection = ds.getConnection();
-        if(dbConnection==null) throw new SQLException("No connection");
-         
-         Statement statement = dbConnection.createStatement();
-         
-         return statement;
-         
-     }
-     
-     public  ArrayList<UserProfile> getUsers() throws NamingException,SQLException {
-         
-        ArrayList<UserProfile> users = new ArrayList<>();
-        ResultSet result = getStatement().executeQuery("SELECT users.id, users.username, roles.rolename FROM calculator.users\n"
-                + "INNER JOIN calculator.roles ON users.id_role = roles.id");
-        while (result.next()) {
-            UserProfile profile = new UserProfile(result.getString("username"), result.getString("rolename"), result.getInt("id"));
-            users.add(profile);
+        try {
+            ds = (DataSource) initContext.lookup("java:comp/env/jdbc/calcdb");
+        } catch (NamingException ex) {
+            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
-        dbConnection.close();
-        return users;
-        
+        if (ds == null) {
+            try {
+                throw new SQLException("No data source");
+            } catch (SQLException ex) {
+                Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
     }
 
-     public List<String> getRoles() throws NamingException,SQLException{
-         
-         ArrayList<String> roles = new ArrayList<>();
-         ResultSet result = getStatement().executeQuery("SELECT rolename FROM calculator.roles");
-         while (result.next()) {
-                String role = result.getString("rolename");
-                roles.add(role);
-         }
-         dbConnection.close();
-         return roles;
-         
-     }
-     
-public String login(){
-         
+    public List<UserProfile> getUsers() {
+
+        List<UserProfile> users = new ArrayList<>();
+        try {
+            try (Connection conn = ds.getConnection()) {
+                Statement stat = conn.createStatement();
+                ResultSet result = stat.executeQuery("SELECT users.id, users.username, roles.rolename FROM calculator.users INNER JOIN calculator.roles ON users.id_role = roles.id");
+                while (result.next()) {
+                    UserProfile profile = new UserProfile(result.getString("username"), result.getString("rolename"), result.getInt("id"));
+                    users.add(profile);
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return users;
+
+    }
+
+    public List<String> getRoles() {
+
+        List<String> roles = new ArrayList<>();
+        try {
+            try (Connection conn = ds.getConnection()) {
+                Statement stat = conn.createStatement();
+                ResultSet result = stat.executeQuery("SELECT rolename FROM calculator.roles");
+
+                while (result.next()) {
+                    String role = result.getString("rolename");
+                    roles.add(role);
+                }
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return roles;
+
+    }
+
+    public String login() {
+
         FacesMessage message = null;
 
         try {
@@ -99,80 +117,70 @@ public String login(){
             FacesContext.getCurrentInstance().addMessage(null, message);
             return null;
         }
-       
+
     }
-         
 
-public void doLogin() throws SQLException {  
-      if (ds == null) throw new SQLException("No data source");      
-      Connection conn = ds.getConnection();
-      if (conn == null) throw new SQLException("No connection");      
-      
-      try {
-         conn.setAutoCommit(false);
-         boolean committed = false;
-         try {
-            PreparedStatement passwordQuery = conn.prepareStatement(
-               "SELECT pass from calculator.users WHERE username = ?");
-            passwordQuery.setString(1,username);
-         
-            ResultSet result = passwordQuery.executeQuery();
+    public void doLogin() throws SQLException {
 
-            if (!result.next()) return;
-            String storedPassword = result.getString("pass");                
-            loggedIn = pass.equals(storedPassword);
-            if (!loggedIn) return;
-            
-            
-            conn.commit();
-            committed = true;
-         } finally {
-            if (!committed) conn.rollback();
-         }
-      }
-      finally {               
-         conn.close();
-      }
-   }
+        try {
+            try (Connection conn = ds.getConnection()) {
+                PreparedStatement passwordQuery = conn.prepareStatement("SELECT pass from calculator.users WHERE username = ?");
 
-public void saveUser() throws NamingException, SQLException{
-    
-    if(pass.equals(pass_again)) {
-          if (ds == null)
-            throw new SQLException("No data source");
-        dbConnection = ds.getConnection();
-        if (dbConnection == null) throw new SQLException("No connection"); 
+                passwordQuery.setString(1, username);
+
+                ResultSet result = passwordQuery.executeQuery();
+
+                if (!result.next()) {
+                    return;
+                }
+                String storedPassword = result.getString("pass");
+                loggedIn = pass.equals(storedPassword);
+                if (!loggedIn) {
+                    return;
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public void saveUser() {
+
+        if (pass.equals(pass_again)) {
             try {
-                dbConnection.setAutoCommit(false);
-                boolean committed = false;
+                try (Connection conn = ds.getConnection()) {
+                    conn.setAutoCommit(false);
+                    boolean committed = false;
 
-                try {
+                    try {
 
-                    PreparedStatement stat = dbConnection.prepareStatement("SELECT id FROM calculator.roles where rolename = ?");
-                    stat.setString(1, rolename);
-                    ResultSet res = stat.executeQuery();
+                        PreparedStatement stat = conn.prepareStatement("SELECT id FROM calculator.roles where rolename = ?");
+                        stat.setString(1, rolename);
+                        ResultSet res = stat.executeQuery();
 
-                    res.next();
-                    int role = res.getInt("id");
-                    String query = "INSERT INTO `calculator`.`users` (`username`, `pass`, `id_role`) VALUES "
-                            + "('"+username+"','"+pass+"','"+role+"')";
-                    PreparedStatement stat2 = dbConnection.prepareStatement(query);
+                        res.next();
+                        int role = res.getInt("id");
+                        String query = "INSERT INTO `calculator`.`users` (`username`, `pass`, `id_role`) VALUES "
+                                + "('" + username + "','" + pass + "','" + role + "')";
+                        PreparedStatement stat2 = conn.prepareStatement(query);
 
-                    stat2.executeUpdate();
-                    
-                    FacesMessage message = null;
-                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные сохранены","Пользователь "+username+" добавлен");
-                    FacesContext.getCurrentInstance().addMessage(null, message);
+                        stat2.executeUpdate();
 
-                    dbConnection.commit();
-                    committed = true;
-                } finally {
-                    if (!committed) {
-                        dbConnection.rollback();
+                        FacesMessage message = null;
+                        message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные сохранены", "Пользователь " + username + " добавлен");
+                        FacesContext.getCurrentInstance().addMessage(null, message);
+
+                        conn.commit();
+                        committed = true;
+                    } finally {
+                        if (!committed) {
+                            conn.rollback();
+                        }
                     }
                 }
-            } finally {
-                dbConnection.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
             FacesMessage message = null;
@@ -182,6 +190,116 @@ public void saveUser() throws NamingException, SQLException{
 
     }
 
+    public void editUser(UserProfile selectedUser) {
+
+        try {
+            try (Connection conn = ds.getConnection()) {
+                conn.setAutoCommit(false);
+                boolean committed = false;
+
+                try {
+                    PreparedStatement pstat = conn.prepareStatement("SELECT id FROM calculator.roles where rolename = ?");
+                    pstat.setString(1, selectedUser.getRolename());
+                    ResultSet res = pstat.executeQuery();
+
+                    res.next();
+                    int role = res.getInt("id");
+                    Statement stat = conn.createStatement();
+                    String querry = "UPDATE `calculator`.`users` SET `username`='" + selectedUser.getUsername() + "', `id_role`='" + role + "' WHERE `id`='" + selectedUser.getId() + "';";
+                    stat.executeUpdate(querry);
+
+                    conn.commit();
+                    committed = true;
+                } finally {
+                    if (!committed) {
+                        conn.rollback();
+                    }
+                }
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+
+        }
+
+    }
+
+    public void deleteUser(UserProfile selectedUser) {
+
+        try {
+            try (Connection conn = ds.getConnection()) {
+                Statement stat = conn.createStatement();
+                stat.executeUpdate("DELETE FROM `calculator`.`users` WHERE `id`='" + selectedUser.getId() + "'");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public void savePass(UserProfile selectedUser) {
+
+        try {
+            try (Connection conn = ds.getConnection()) {
+
+                conn.setAutoCommit(false);
+                boolean committed = false;
+                try {
+                    PreparedStatement pstat = conn.prepareStatement("SELECT pass FROM calculator.users where id = ?");
+                    pstat.setInt(1, selectedUser.getId());
+                    ResultSet res = pstat.executeQuery();
+                    res.next();
+
+                    if (res.getString("pass").equals(oldPass)) {
+                        if (newPass.equals(newPass_again)) {
+
+                            String querry1 = "UPDATE `calculator`.`users` SET `pass`='" + newPass + "' WHERE `id`='" + selectedUser.getId() + "'";
+                            Statement stat = conn.createStatement();
+                            stat.executeUpdate(querry1);
+
+                            FacesMessage message = null;
+                            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Пароль изменен", "Пароль изменен");
+                            FacesContext.getCurrentInstance().addMessage(null, message);
+                        } else {
+                            FacesMessage message = null;
+                            message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Введенные пароли не совпадают", "Повтор пароля совершен с ошибкой");
+                            FacesContext.getCurrentInstance().addMessage(null, message);
+                        }
+                    } else {
+                        FacesMessage message = null;
+                        message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Неверный пароль", "Введенный пароль не совпадает с текущим");
+                        FacesContext.getCurrentInstance().addMessage(null, message);
+                    }
+
+                    conn.commit();
+                    committed = true;
+                } finally {
+                    if (!committed) {
+                        conn.rollback();
+                    }
+                }
+
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+
+        }
+
+    }
+
+    public void setSelectedUser(UserProfile selectedUser) {
+
+        this.selectedUser = selectedUser;
+
+    }
+
+    /**
+     * @return the selectedUser
+     */
+    public UserProfile getSelectedUser() {
+        return selectedUser;
+    }
 
     /**
      * @return the username
@@ -238,8 +356,79 @@ public void saveUser() throws NamingException, SQLException{
     public void setPass_again(String pass_again) {
         this.pass_again = pass_again;
     }
-     
-    
-    
-    
+
+    /**
+     * @return the oldPass
+     */
+    public String getOldPass() {
+        return oldPass;
+    }
+
+    /**
+     * @param oldPass the oldPass to set
+     */
+    public void setOldPass(String oldPass) {
+        this.oldPass = oldPass;
+    }
+
+    /**
+     * @param selectedUser
+     * @return the currentDtPass
+     */
+    public String getPassDt(UserProfile selectedUser) {
+
+        String passDt = null;
+        try {
+            try (Connection conn = ds.getConnection()) {
+                PreparedStatement passwordQuery = conn.prepareStatement("SELECT users.pass from calculator.users WHERE users.id = ?");
+
+                passwordQuery.setInt(1, selectedUser.getId());
+
+                ResultSet result = passwordQuery.executeQuery();
+                result.next();
+
+                passDt = result.getString("pass");
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return passDt;
+    }
+
+    /**
+     * @param currentDtPass the currentDtPass to set
+     */
+    public void setCurrentDtPass(String currentDtPass) {
+        this.currentDtPass = currentDtPass;
+    }
+
+    /**
+     * @return the newPass
+     */
+    public String getNewPass() {
+        return newPass;
+    }
+
+    /**
+     * @param newPass the newPass to set
+     */
+    public void setNewPass(String newPass) {
+        this.newPass = newPass;
+    }
+
+    /**
+     * @return the newPass_again
+     */
+    public String getNewPass_again() {
+        return newPass_again;
+    }
+
+    /**
+     * @param newPass_again the newPass_again to set
+     */
+    public void setNewPass_again(String newPass_again) {
+        this.newPass_again = newPass_again;
+    }
+
 }

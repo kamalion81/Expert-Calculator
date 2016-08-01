@@ -1,14 +1,30 @@
-package beans;
+package dao;
 
 
+import profiles.CalcProfile;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import dao.SteelDAO;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import javax.faces.bean.ApplicationScoped;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.naming.NamingException;
+import javax.sql.*;
 
-public class Calc implements Serializable {
+@ManagedBean
+@ApplicationScoped
+public class CalcDAO implements Serializable {
+    
+    private DataBase data;
 
     //Поля входящих данных
-    private Double steel;
+    private String steel;
     private Double intPressure;
     private Double hydroPressure;
     private Double temp;
@@ -50,18 +66,55 @@ public class Calc implements Serializable {
     private Double resShearForceElasticity;
     private Double resShearForcePermissible;
     private Double resStrengthConditionsShearForce;
+    
+    
+    
+    public void setSteelCharacteristics() throws SQLException, NamingException{
+        
+        DataBase db = new DataBase();
+        
+        
+        Connection conn = db.getdbConnection();
+        PreparedStatement stat = conn.prepareStatement("SELECT sigma20,sigmaT FROM calculator.steels WHERE mark = ?");
+        stat.setString(1, steel);
+        ResultSet res =  stat.executeQuery();
+        res.next();
+        
+        temp20 = res.getDouble("sigma20");
+        tempT = res.getDouble("sigmaT");
+        
+        conn.close();
+    }
+    
+    public ArrayList<CalcProfile> getCalcs() throws SQLException, NamingException {
+        
+        data = new DataBase();
+
+        ArrayList<CalcProfile> calcs = new ArrayList<>();
+        Connection conn = data.getdbConnection();
+        PreparedStatement stat = conn.prepareStatement("SELECT * FROM calculator.calcs");
+
+        ResultSet result = stat.executeQuery();
+        while (result.next()) {
+            CalcProfile profile = new CalcProfile(result.getInt("id"), result.getDate("date"), result.getString("name"));
+            calcs.add(profile);
+        }
+
+        return calcs;
+
+    }
 
     /**
      * @return the steel
      */
-    public Double getSteel() {
+    public String getSteel() {
         return steel;
     }
 
     /**
      * @param steel the steel to set
      */
-    public void setSteel(double steel) {
+    public void setSteel(String steel) {
         this.steel = steel;
     }
 
@@ -391,12 +444,6 @@ public class Calc implements Serializable {
         this.resGreaterThickness = resGreaterThickness;
     }
 
-    /**
-     * @param steel the steel to set
-     */
-    public void setSteel(Double steel) {
-        this.steel = steel;
-    }
 
     /**
      * @param intPressure the intPressure to set

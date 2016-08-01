@@ -1,10 +1,12 @@
 package beans;
 
 
+import dao.CalcDAO;
 import java.io.Serializable;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
+import javax.naming.NamingException;
 import org.primefaces.event.FlowEvent;
 
 /**
@@ -13,17 +15,17 @@ import org.primefaces.event.FlowEvent;
  */
 @ManagedBean
 @ViewScoped
-public class CalcWizard implements Serializable {
+public class CalcWizardBean implements Serializable {
 
-    private Calc calc = new Calc();
+    private CalcDAO calc = new CalcDAO();
 
     private boolean skip;
 
-    public Calc getCalc() {
+    public CalcDAO getCalc() {
         return calc;
     }
     
-    public void setCalc(Calc calc) {
+    public void setCalc(CalcDAO calc) {
         this.calc = calc;
     }
 
