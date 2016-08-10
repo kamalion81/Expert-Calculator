@@ -163,7 +163,7 @@ public class CalcDAO implements Serializable {
     public void insertPressure(){
         
 //        resThickness = (intPressure*diam)/(2*tempT*weld-intPressure);
-        resThickness = new Float(10.3) ;
+        setResIntPressure(intPressure);
         
     }
     

@@ -48,7 +48,7 @@
                                 <p:column>P<sub>i</sub></p:column>
                                 <p:column style="background: blanchedalmond">
                                     <p:inputText id="intPressure" type="float" value="#{calcWizardBean.calc.intPressure}" label="Расчетное внутреннее давление">
-                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertPressure}" update="resThickness" />
+                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertPressure}" update="resIntPressure" />
                                     </p:inputText>
                                     <p:message for="intPressure"/>
                                 </p:column>
@@ -316,7 +316,7 @@
                                     <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[P\bigr]} = \frac{2\normal \phi{\bigl[\sigma\bigr]}^{\tiny T}\left(S-C\right)}{D%2BS-C}"></img>
                                 </p:column>
                                 <p:column> 
-                                    <p:inputText  id="resIntPressure" value="#{calcDAO.resIntPressure}" styleClass="outputLabel"/>
+                                    <p:inputText type="float" id="resIntPressure" value="#{calcDAO.resIntPressure}" styleClass="outputLabel"/>
                                 </p:column>
                             </p:row>
 

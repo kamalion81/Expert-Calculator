@@ -5,6 +5,7 @@ import dao.CalcDAO;
 import dao.MaterialDAO;
 import java.io.Serializable;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
 import javax.naming.NamingException;
@@ -18,10 +19,16 @@ import org.primefaces.event.FlowEvent;
 @ViewScoped
 public class CalcWizardBean implements Serializable {
 
-    private CalcDAO calc = new CalcDAO();
-    private MaterialDAO mat = new MaterialDAO();
+//    private CalcDAO calc = new CalcDAO();
+//    private MaterialDAO mat = new MaterialDAO();
 
     private boolean skip;
+    
+    @ManagedProperty("#{calcDAO}")
+    private  CalcDAO calc;
+    
+    @ManagedProperty("#{materialDAO}")
+    private  MaterialDAO mat;
 
     public CalcDAO getCalc() {
         return calc;
