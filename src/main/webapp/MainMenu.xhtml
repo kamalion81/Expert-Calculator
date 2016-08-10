@@ -14,13 +14,24 @@
         <p:growl id="messages" showDetail="false"/>
 
         <h3 style="margin-top:0">Основное меню</h3>
-        <p:menu>
-            <p:submenu label="Пункты">
-                <p:menuitem value="Калькулятор" outcome="CalculationWizard"/>
+        <p:menu style=" width: 400px">
+            
+            <p:submenu label="Основное">
+                <p:menuitem value="Калькулятор" outcome="CalculationWizard_1"/>
                 <p:menuitem value="Пользователи" outcome="UsersList"/>
-                <p:menuitem value="Марки стали" outcome="SteelList"/>
                 <p:menuitem value="Расчеты" outcome="CalculationList"/>
             </p:submenu>
+            
+            <p:submenu label="Материалы">
+                <p:menuitem value="Материалы" outcome="MaterialList"/>
+                <p:menuitem value="Допускаемое напряжение" outcome="DopuskNaprList"/>
+                <p:menuitem value="Коэффициент линейного расширения" outcome="KoefList"/>
+                <p:menuitem value="Модуль продольной упругости" outcome="ModuleList"/>
+                <p:menuitem value="Предел текучести" outcome="PredelTekuchList"/>
+                <p:menuitem value="Временное сопротивление" outcome="VremSoprotivList"/>
+            </p:submenu>
+            
+            
         </p:menu>
     </h:form>
 </html>

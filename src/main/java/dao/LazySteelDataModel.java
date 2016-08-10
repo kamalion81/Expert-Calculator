@@ -1,6 +1,6 @@
 package dao;
 
-import profiles.SteelProfile;
+import profiles.MaterialProfile;
 import java.util.List;
 import java.util.Map;
 import org.primefaces.model.LazyDataModel;
@@ -9,16 +9,16 @@ import org.primefaces.model.SortOrder;
  *
  * @author Kamalion
  */
-public class LazySteelDataModel extends LazyDataModel<SteelProfile>{
+public class LazySteelDataModel extends LazyDataModel<MaterialProfile>{
     
-    private List<SteelProfile> datasource;
+    private List<MaterialProfile> datasource;
     
-    public LazySteelDataModel(List<SteelProfile> datasource) {
+    public LazySteelDataModel(List<MaterialProfile> datasource) {
         this.datasource = datasource;
     }
     
     @Override
-    public List<SteelProfile> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String,Object> filters) {
+    public List<MaterialProfile> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String,Object> filters) {
         int dataSize = datasource.size();
         this.setRowCount(dataSize);
         return datasource;

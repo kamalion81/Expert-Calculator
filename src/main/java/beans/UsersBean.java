@@ -3,7 +3,6 @@ package beans;
 import profiles.UserProfile;
 import java.io.Serializable;
 import java.util.List;
-import java.util.ArrayList;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -12,10 +11,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
-import dao.*;
-import java.sql.SQLException;
-import javax.faces.event.ActionEvent;
-import javax.naming.NamingException;
+import dao.UserDAO;
 import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.RowEditEvent;
 
@@ -123,6 +119,7 @@ public class UsersBean implements Serializable{
         profile.savePass(selectedUser);
         setUsers(profile.getUsers());
     }
+
     
 }
     

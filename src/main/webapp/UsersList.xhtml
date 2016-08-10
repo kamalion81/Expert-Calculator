@@ -14,13 +14,13 @@
         
         <h:form id="form">
             <p:growl id="growl" showDetail="false"/>
-            <p:dataTable id="usersDt" var="user" value="#{usersBean.users}" editable="true" lazy="true"
-                         paginator="true" rows="10" selectionMode="single" selection="#{usersBean.selectedUser}" rowKey="#{user.id}">
+            <p:dataTable id="usersDt" var="user" value="#{usersBean.users}" editable="true"
+                         paginator="true" rows="20"  selection="#{usersBean.selectedUser}" rowKey="#{user.id}">
 
                     <f:facet name="header">
                         Список пользователей
                         <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-user-plus" label="Новый пользователь" onclick="PF('dlg').show();"/>
-                        <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-times-circle" update="growl" ajax="false" actionListener="#{usersBean.deleteUsers}" label="Удалить пользователей"/>
+                        <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-times-circle" update=":form:usersDt :form:growl" actionListener="#{usersBean.deleteUsers}" label="Удалить пользователей"/>
                         <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-exchange" onclick="PF('dlg2').show();" label="Сменить пароль"/>
                     </f:facet>
                     
@@ -29,12 +29,18 @@
                     <p:ajax event="rowEdit" process="@this" listener="#{usersBean.onRowEdit}" update=":form:growl" />
                     <p:ajax event="rowEditCancel" process="@this" listener="#{usersBean.onRowCancel}" update=":form:growl" />
 
-                    <p:column headerText="Код">
-                        <h:outputText value="#{user.id}" />
+                    <p:column headerText="Код" rendered="false">
+                        <h:outputText value="#{user.id}"/>
                     </p:column>
-
+                    
+                    <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                    
+                    <p:column style="width:32px">
+                        <p:rowEditor/>
+                    </p:column>
+                    
                     <p:column headerText="Пользователь">
-                        <p:cellEditor>
+                        <p:cellEditor >
                             <f:facet name="output"><h:outputText value="#{user.username}"/></f:facet>
                             <f:facet name="input"><p:inputText value="#{user.username}" style="width:100%" label="Пользователь"/></f:facet>
                         </p:cellEditor>
@@ -51,12 +57,7 @@
                         </p:cellEditor>
                     </p:column>
 
-                    <p:column style="width:32px">
-                        <p:rowEditor/>
-                    </p:column>
                     
-
-
 
                 </p:dataTable>
                 
@@ -79,7 +80,7 @@
                     <p:password value="#{userDAO.pass_again}" required="false" label="Повторение пароля"/>
 
                     <f:facet name="footer">
-                        <p:commandButton  value="Сохранить" update="growl" ajax="false" action="#{usersBean.saveUser}"/>
+                        <p:commandButton  value="Сохранить" update=":form:growl :form:usersDt" action="#{usersBean.saveUser}"/>
                     </f:facet>  
                 </h:panelGrid>
             </p:dialog>

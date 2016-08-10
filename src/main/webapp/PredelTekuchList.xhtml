@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" 
+      xmlns:p="http://primefaces.org/ui">
+    
+    <h:head>
+        <title>Предел текучести</title>
+    </h:head>
+    <h:body>
+        
+        <h:form id="form">
+            <p:growl id="growl" showDetail="false"/>
+            <p:dataTable id="Dt" var="pred_tek" value="#{predelTekuchBean.values}" editable="true"
+                         paginator="true" rows="20"  selection="#{predelTekuchBean.selectedValue}" rowKey="#{pred_tek.id}">
+
+                    <f:facet name="header">
+                        Предел текучести
+                        <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-plus-circle" label="Новое значение" onclick="PF('dlg').show();"/>
+                        <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-times-circle" update=":form:Dt :form:growl" actionListener="#{predelTekuchBean.deleteValues()}" label="Удалить значение"/>
+                    </f:facet>
+
+                <p:ajax event="rowEdit" process="@this" listener="#{predelTekuchBean.onRowEdit}" update=":form:growl" />
+                <p:ajax event="rowEditCancel" process="@this" listener="#{predelTekuchBean.onRowCancel}" update=":form:growl" />
+
+                    <p:column headerText="Код" rendered="false">
+                        <h:outputText value="#{pred_tek.id}"/>
+                    </p:column>
+                    
+                    <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                    
+                    <p:column style="width:32px">
+                        <p:rowEditor/>
+                    </p:column>
+                    
+                    <p:column headerText="Материал">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{pred_tek.material}"/></f:facet>
+                            <f:facet name="input">
+                                <h:selectOneMenu required="false" value="#{pred_tek.material}" style="width:100%">
+                                    <f:selectItems value="#{predelTekuchDAO.materials}" var="roles" itemLabel="#{materials}" itemValue="#{materials}" />
+                                </h:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Толщина, минимум">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{pred_tek.thickness_min}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{pred_tek.thickness_min}" style="width:100%" label="Толщина, минимум"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    
+                     <p:column headerText="Толщина, максимум">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{pred_tek.thickness_max}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{pred_tek.thickness_max}" style="width:100%" label="Толщина, максимум"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    
+                    <p:column headerText="Температура">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{pred_tek.temp}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{pred_tek.temp}" style="width:100%" label="Температура"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    
+                    <p:column headerText="Предел текучести">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{pred_tek.value}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{pred_tek.value}" style="width:100%" label="Предел текучести"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    
+
+                </p:dataTable>
+                
+            
+            <p:dialog header="Новое значение" widgetVar="dlg" resizable="false">
+                <h:panelGrid columns="2" cellpadding="5">
+                    
+                    <h:outputLabel  value="Материал:" />
+                    <h:selectOneMenu  required="false" value="#{predelTekuchDAO.matname}" style="width:100%">
+                        <f:selectItems value="#{predelTekuchDAO.materials}" var="materials" itemLabel="#{materials}" itemValue="#{materials}" />
+                    </h:selectOneMenu>
+
+                    <h:outputLabel  value="Толщина, минимум:" />
+                    <p:inputText    value="#{predelTekuchDAO.thickness_min}" required="false" label="Толщина, минимум" />
+                    
+                    <h:outputLabel  value="Толщина, максимум:" />
+                    <p:inputText    value="#{predelTekuchDAO.thickness_max}" required="false" label="Толщина, максимум" />
+                    
+                    <h:outputLabel  value="Температура:" />
+                    <p:inputText    value="#{predelTekuchDAO.temp}" required="false" label="Температура" />
+                    
+                    <h:outputLabel  value="Предел текучести:" />
+                    <p:inputText    value="#{predelTekuchDAO.value}" required="false" label="Предел текучести" />
+
+                    <f:facet name="footer">
+                        <p:commandButton  value="Сохранить" update=":form:growl :form:Dt" actionListener="#{predelTekuchBean.saveValue}"/>
+                    </f:facet>  
+                </h:panelGrid>
+            </p:dialog>
+            
+        </h:form>
+    </h:body>
+</html>
+

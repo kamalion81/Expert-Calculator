@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" 
+      xmlns:p="http://primefaces.org/ui">
+    
+    <h:head>
+        <title>Материалы</title>
+    </h:head>
+    <h:body>
+        
+        <h:form id="form">
+            <p:growl id="growl" showDetail="false"/>
+            <p:dataTable id="matDt" var="material" value="#{materialBean.materials}" editable="true"
+                         paginator="true" rows="20"  selection="#{materialBean.selectedMaterial}" rowKey="#{material.id}">
+
+                    <f:facet name="header">
+                        Список материалов
+                        <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-plus-circle" label="Новый материал" onclick="PF('dlg').show();"/>
+                        <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-times-circle" update=":form:matDt :form:growl" actionListener="#{materialBean.deleteMaterials()}" label="Удалить материал"/>
+                    </f:facet>
+
+                <p:ajax event="rowEdit" process="@this" listener="#{materialBean.onRowEdit}" update=":form:growl" />
+                <p:ajax event="rowEditCancel" process="@this" listener="#{materialBean.onRowCancel}" update=":form:growl" />
+
+                    <p:column headerText="Код" rendered="false">
+                        <h:outputText value="#{material.id}"/>
+                    </p:column>
+                    
+                    <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                    
+                    <p:column style="width:32px">
+                        <p:rowEditor/>
+                    </p:column>
+                    
+                    <p:column headerText="Материал">
+                        <p:cellEditor >
+                            <f:facet name="output"><h:outputText value="#{material.matname}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{material.matname}" style="width:100%" label="Пользователь"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Группа материалов">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{material.matgroup}"/></f:facet>
+                            <f:facet name="input">
+                                <h:selectOneMenu required="false" value="#{material.matgroup}" style="width:100%">
+                                    <f:selectItems value="#{materialDAO.groups}" var="roles" itemLabel="#{groups}" itemValue="#{groups}" />
+                                </h:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    
+
+                </p:dataTable>
+                
+            
+            <p:dialog header="Новый материал" widgetVar="dlg" resizable="false">
+                <h:panelGrid columns="2" cellpadding="5">
+                    <h:outputLabel for="matname" value="Материал:" />
+                    <p:inputText id="matname" value="#{materialDAO.matname}" required="false" label="Наименование материала" />
+
+                    <h:outputLabel value="Группа материалов:" />
+                    
+                    <h:selectOneMenu required="false" value="#{materialDAO.groupname}" style="width:100%">
+                        <f:selectItems value="#{materialDAO.groups}" var="groups" itemLabel="#{groups}" itemValue="#{groups}" />
+                    </h:selectOneMenu>
+
+                    <f:facet name="footer">
+                        <p:commandButton  value="Сохранить" update=":form:growl :form:matDt" actionListener="#{materialBean.saveMaterial}"/>
+                    </f:facet>  
+                </h:panelGrid>
+            </p:dialog>
+            
+        </h:form>
+    </h:body>
+</html>
+

@@ -6,10 +6,11 @@
 package dao;
 
 import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sql.DataSource;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.annotation.Resource;
 
 /**
  *
@@ -17,28 +18,46 @@ import javax.annotation.Resource;
  */
 public class DataBase {
     
-//    @Resource(name="jdbc/calcdb")
     private DataSource ds;
     
-    private Connection dbConnection;
 
-    public DataBase() throws NamingException, SQLException {
+    public DataBase(){
 
-        InitialContext initContext = new InitialContext();
-        ds = (DataSource) initContext.lookup("java:comp/env/jdbc/calcdb");
+        InitialContext initContext = null;
+        try {
+            initContext = new InitialContext();
+        } catch (NamingException ex) {
+            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            ds = (DataSource) initContext.lookup("java:comp/env/jdbc/calcdb");
+        } catch (NamingException ex) {
+            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
         if (ds == null) {
-            throw new SQLException("No data source");
+            try {
+                throw new SQLException("No data source");
+            } catch (SQLException ex) {
+                Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
     }
 
     /**
-     * @return the dbConnection
-     * @throws java.sql.SQLException
+     * @return the ds
      */
-    public Connection getdbConnection() throws SQLException {
-        dbConnection = ds.getConnection();
-        return dbConnection;
+    public DataSource getDs() {
+        return ds;
     }
+
+    /**
+     * @param ds the ds to set
+     */
+    public void setDs(DataSource ds) {
+        this.ds = ds;
+    }
+    
+
 
 }

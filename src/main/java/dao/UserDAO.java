@@ -39,25 +39,30 @@ public class UserDAO implements Serializable {
     private DataSource ds;
 
     public UserDAO() {
+        
+        DataBase db = new DataBase();
+        ds = db.getDs();
+        
+        
 
-        InitialContext initContext = null;
-        try {
-            initContext = new InitialContext();
-        } catch (NamingException ex) {
-            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            ds = (DataSource) initContext.lookup("java:comp/env/jdbc/calcdb");
-        } catch (NamingException ex) {
-            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (ds == null) {
-            try {
-                throw new SQLException("No data source");
-            } catch (SQLException ex) {
-                Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+//        InitialContext initContext = null;
+//        try {
+//            initContext = new InitialContext();
+//        } catch (NamingException ex) {
+//            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        try {
+//            ds = (DataSource) initContext.lookup("java:comp/env/jdbc/calcdb");
+//        } catch (NamingException ex) {
+//            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        if (ds == null) {
+//            try {
+//                throw new SQLException("No data source");
+//            } catch (SQLException ex) {
+//                Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        }
 
     }
 
@@ -228,7 +233,9 @@ public class UserDAO implements Serializable {
 
         try {
             try (Connection conn = ds.getConnection()) {
+                
                 Statement stat = conn.createStatement();
+                
                 stat.executeUpdate("DELETE FROM `calculator`.`users` WHERE `id`='" + selectedUser.getId() + "'");
             }
         } catch (SQLException ex) {
@@ -394,13 +401,6 @@ public class UserDAO implements Serializable {
             Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
         return passDt;
-    }
-
-    /**
-     * @param currentDtPass the currentDtPass to set
-     */
-    public void setCurrentDtPass(String currentDtPass) {
-        this.currentDtPass = currentDtPass;
     }
 
     /**

@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" 
+      xmlns:p="http://primefaces.org/ui">
+    
+    <h:head>
+        <title>Коэффициент линейного расширения</title>
+    </h:head>
+    <h:body>
+        
+        <h:form id="form">
+            <p:growl id="growl" showDetail="false"/>
+            <p:dataTable id="Dt" var="koef" value="#{koefBean.values}" editable="true"
+                         paginator="true" rows="20"  selection="#{koefBean.selectedValue}" rowKey="#{koef.id}">
+
+                    <f:facet name="header">
+                        Коэффициент линейного расширения
+                        <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-plus-circle" label="Новое значение" onclick="PF('dlg').show();"/>
+                        <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-times-circle" update=":form:Dt :form:growl" actionListener="#{koefBean.deleteValues()}" label="Удалить значение"/>
+                    </f:facet>
+
+                <p:ajax event="rowEdit" process="@this" listener="#{koefBean.onRowEdit}" update=":form:growl" />
+                <p:ajax event="rowEditCancel" process="@this" listener="#{koefBean.onRowCancel}" update=":form:growl" />
+
+                    <p:column headerText="Код" rendered="false">
+                        <h:outputText value="#{koef.id}"/>
+                    </p:column>
+                    
+                    <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                    
+                    <p:column style="width:32px">
+                        <p:rowEditor/>
+                    </p:column>
+                    
+                    <p:column headerText="Материал">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{koef.matname}"/></f:facet>
+                            <f:facet name="input">
+                                <h:selectOneMenu required="false" value="#{koef.matname}" style="width:100%">
+                                    <f:selectItems value="#{koefDAO.materials}" var="roles" itemLabel="#{materials}" itemValue="#{materials}" />
+                                </h:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Температура, минимум">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{koef.temp_min}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{koef.temp_min}" style="width:100%" label="Толщина, минимум"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    
+                     <p:column headerText="Температура, максимум">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{koef.temp_max}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{koef.temp_max}" style="width:100%" label="Толщина, максимум"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    
+                    <p:column headerText="Коэффициент линейного расширения">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{koef.value}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{koef.value}" style="width:100%" label="Допускаемое напряжение"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    
+
+                </p:dataTable>
+                
+            
+            <p:dialog header="Новое значение" widgetVar="dlg" resizable="false">
+                <h:panelGrid columns="2" cellpadding="5">
+                    
+                    <h:outputLabel  value="Материал:" />
+                    <h:selectOneMenu  required="false" value="#{koefDAO.matname}" style="width:100%">
+                        <f:selectItems value="#{koefDAO.materials}" var="materials" itemLabel="#{materials}" itemValue="#{materials}" />
+                    </h:selectOneMenu>
+
+                    <h:outputLabel  value="Температура, минимум:" />
+                    <p:inputText    value="#{koefDAO.temp_min}" required="false" label="Толщина, минимум" />
+                    
+                    <h:outputLabel  value="Температура, максимум:" />
+                    <p:inputText    value="#{koefDAO.temp_max}" required="false" label="Толщина, максимум" />
+                    
+                    <h:outputLabel  value="Коэффициент линейного расширения:" />
+                    <p:inputText    value="#{koefDAO.value}" required="false" label="Допускаемое напряжение" />
+
+                    <f:facet name="footer">
+                        <p:commandButton  value="Сохранить" update=":form:growl :form:Dt" actionListener="#{koefBean.saveValue}"/>
+                    </f:facet>  
+                </h:panelGrid>
+            </p:dialog>
+            
+        </h:form>
+    </h:body>
+</html>
+

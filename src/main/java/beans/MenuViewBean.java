@@ -16,7 +16,8 @@ import org.primefaces.model.menu.MenuModel;
  * @author Kamalion
  */
 @ManagedBean
-public class MenuViewBean {
+@ViewScoped
+public class MenuViewBean implements Serializable{
     private MenuModel model;
     
     @PostConstruct

@@ -1,0 +1,562 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" 
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Расчет</title>
+    </h:head>
+    <h:form id="form">
+        <p:growl id="growl" sticky="true" showDetail="true"/>
+        <p:layout  style="min-width:700px; min-height: 1750px; max-width: 1400px" >
+            <p:layoutUnit   position="west" resizable="false" size="700" minSize="700" maxSize="700">
+                <p:tab id="input" title="Данные">
+                    <p:panel header="Входящие данные">
+                        <p:panelGrid   style="margin-top: 20px;
+                                    font-style: italic; font-size: small">
+
+                            <f:facet name="header">
+                                <p:row>
+                                    <p:column colspan="1">Наименование</p:column>
+                                    <p:column colspan="1">Обозначение</p:column>
+                                    <p:column colspan="1">Величина</p:column>
+                                </p:row>
+                            </f:facet>
+
+                            <p:row>
+                                <p:column>Материал обечайки</p:column>
+                                <p:column>Марка стали</p:column>
+                                <p:column style="background: blanchedalmond">
+                                    <p:selectOneMenu value="#{calcWizardBean.calc.material}" effect="fold">
+                                        <p:ajax event="change" listener="#{calcWizardBean.calc.insertTemp}" update="lineExpCoeff tempT temp20 yieldStrengthT yieldStrength20 tempResist elasticity" />
+                                        <f:selectItem itemLabel="Выберите материал" itemValue="" />
+                                        <f:selectItems value="#{calcWizardBean.mat.names}" var="material"/>
+                                    </p:selectOneMenu>
+                                    <!--<p:inputText style="color: yellow; background: teal" id="steel" value="{calcWizardBean.calc.steel}" required="true" label="Материал обечайки">
+                                        <p:ajax event="blur" listener="{calcWizardBean.calc.setSteelCharacteristics}" update="tempT,temp20" />
+                                    </p:inputText>-->   
+                                    <!--<p:message for="steel"/>-->
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Расчетное внутреннее давление, МПа</p:column>
+
+                                <p:column>P<sub>i</sub></p:column>
+                                <p:column style="background: blanchedalmond">
+                                    <p:inputText id="intPressure" type="float" value="#{calcWizardBean.calc.intPressure}" label="Расчетное внутреннее давление">
+                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertPressure}" update="resThickness" />
+                                    </p:inputText>
+                                    <p:message for="intPressure"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Давление гидроиспытаний, МПа</p:column>
+                                <p:column>P<sub>H</sub></p:column>
+                                <p:column style="background: blanchedalmond">
+                                    <p:inputText id="hydroPressure" type="float" value="#{calcWizardBean.calc.hydroPressure}" required="true" label="Давление гидроиспытаний"/>
+                                    <p:message for="hydroPressure"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Расчетная температура, <sup>o</sup>C</p:column>
+                                <p:column>T</p:column>
+                                <p:column style="background: blanchedalmond">
+                                    <p:inputText id="temp" value="#{calcWizardBean.calc.temp}" required="true" label="Расчетная температура" >
+                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertTemp}" update="lineExpCoeff,tempT,temp20,yieldStrengthT,yieldStrength20,tempResist" />
+                                    </p:inputText>
+                                    <!--<p:watermark for="temp" value="20" />-->
+                                    <!--lineExpCoeff,tempT,temp20,yieldStrengthT,yieldStrength20,tempResist-->
+                                    <!--<p:message for="temp"/>-->
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Допускаемое напряжение при расчетной
+                                    <br></br>температуре Т <sup>o</sup>С, МПа
+                                </p:column>
+                                <p:column>[&sigma;]<sup>T</sup></p:column>
+                                <p:column style="background: cadetblue">
+                                    <p:inputText id="tempT"  type="float" value="#{calcWizardBean.calc.tempT}" required="true" label="Допускаемое напряжение при расчетной температуре Т"/>
+                                    <!--<h:outputText id="tempT" value="{calcWizardBean.calc.tempT}"/>-->
+                                    <p:message for="tempT"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Допускаемое напряжение при расчетной 
+                                    <br></br>температуре 20 <sup>o</sup>С, МПа
+                                </p:column>
+                                <p:column>[&sigma;]<sup>20</sup></p:column>
+                                <p:column style="background: cadetblue">
+                                    <p:inputText id="temp20" type="float" value="#{calcWizardBean.calc.temp20}" required="true" label="Допускаемое напряжение при расчетной температуре 20"/>
+                                    <p:message for="temp20"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Внутренний диаметр цилиндрической 
+                                    <br></br>обечайки, мм
+                                </p:column>
+                                <p:column>D</p:column>
+                                <p:column style="background: blanchedalmond">
+                                    <p:inputText id="diam" value="#{calcWizardBean.calc.diam}" required="true" label="Внутренний диаметр цилиндрической обечайки"/>
+                                    <p:message for="diam"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Номинальная исполнительная (или
+                                    <br></br>минимально измеренная) толщина
+                                    <br></br>стенки цилиндрической обечайки, мм
+                                </p:column>
+                                <p:column>S</p:column>
+                                <p:column style="background: blanchedalmond">
+                                    <p:inputText id="thickness" value="#{calcWizardBean.calc.thickness}" required="true" label="Номинальная исполнительная толщина">
+                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertThickness}" update="tempT,temp20,yieldStrengthT,yieldStrength20,tempResist" />
+                                    </p:inputText>
+                                    <p:message for="thickness"/>
+                                </p:column>
+                                <!--tempT,temp20,yieldStrengthT,yieldStrength20,tempResist-->
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Прибавка на коррозию и эрозию, мм</p:column>
+                                <p:column>c<sub>1</sub></p:column>
+                                <p:column style="background: blanchedalmond">
+                                    <p:inputText id="corrosion" type="float" value="#{calcWizardBean.calc.corrosion}" required="true" label="Прибавка на коррозию и эрозию">
+                                        <p:ajax event="change" listener="#{calcWizardBean.calc.insertC}" update="addThickness" />
+                                    </p:inputText>
+                                    <p:message for="corrosion"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Прибавка на минусовый допуск, мм</p:column>
+                                <p:column>c<sub>2</sub></p:column>
+                                <p:column style="background: blanchedalmond">
+                                    <p:inputText id="minusTolerance" type="float" value="#{calcWizardBean.calc.minusTolerance}" required="true" label="Прибавка на минусовый допуск">
+                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertC}" update="addThickness" />
+                                    </p:inputText>
+                                    <p:message for="minusTolerance"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Прибавка технологическая, мм</p:column>
+                                <p:column>c<sub>3</sub></p:column>
+                                <p:column style="background: blanchedalmond">
+                                    <p:inputText id="techno" type="float" value="#{calcWizardBean.calc.techno}" required="true" label="Прибавка технологическая">
+                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertC}" update="addThickness" />
+                                    </p:inputText>
+                                    <p:message for="techno"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Суммарная прибавка к толщине стенки
+                                    <br></br>цилиндрической обечайки, мм</p:column>
+                                <p:column>C = c<sub>1</sub>+c<sub>2</sub>+c<sub>3</sub></p:column>
+                                <p:column style="background: cadetblue">
+                                    <p:inputText id="addThickness" type="float" value="#{calcWizardBean.calc.addThickness}" required="true" label="Суммарная прибавка"/>
+                                    <p:message for="addThickness"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Коэффициент линейного расширения  
+                                    <br></br>(указывается марка стали) при Т <sup>o</sup>С, 1/<sup>o</sup>С</p:column>
+                                <p:column>&alpha;</p:column>
+                                <p:column style="background: cadetblue">
+                                    <p:inputText id="lineExpCoeff" type="float" value="#{calcWizardBean.calc.lineExpCoeff}" required="true" label="Коэффициент линейного расширения" />
+                                    <p:message for="lineExpCoeff"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Модуль упругости (указывается марка   
+                                    <br></br>стали) при Т <sup>o</sup>С, МПа</p:column>
+                                <p:column>E</p:column>
+                                <p:column style="background: cadetblue">
+                                    <p:inputText id="elasticity" type="float" value="#{calcWizardBean.calc.elasticity}" required="true" label="Модуль упругости"/>
+                                    <p:message for="elasticity"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Предел текучести для стали (указывается   
+                                    <br></br>марка стали)  при температуре Т <sup>o</sup>С, МПа</p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {R}^{\tiny T}_{\tiny p\;\tiny 02}"></img>
+                                </p:column>
+                                <p:column style="background: cadetblue">
+                                    <p:inputText id="yieldStrengthT" type="float" value="#{calcWizardBean.calc.yieldStrengthT}" required="true" label="Предел текучести"/>
+                                    <p:message for="yieldStrengthT"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Временное сопротивление для стали 
+                                    <br></br>(указывается марка стали) при 
+                                    <br></br> температуре Т <sup>o</sup>С, МПа
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {R}^{\tiny T}_{\tiny m}"></img>
+                                </p:column>
+                                <p:column style="background: cadetblue">
+                                    <p:inputText id="tempResist" type="float" value="#{calcWizardBean.calc.tempResist}" required="true" label="Временное сопротивление"/>
+                                    <p:message for="tempResist"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Предел текучести для стали (указывается 
+                                    <br></br>марки стали)  при температуре 20 <sup>o</sup>С,
+                                    <br></br> МПа
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {R}^{\tiny 20}_{\tiny p\;\tiny 02}"></img>
+                                </p:column>
+                                <p:column style="background: cadetblue">
+                                    <p:inputText id="yieldStrength20" type="float" value="#{calcWizardBean.calc.yieldStrength20}" required="true" label="Предел текучести"/>
+                                    <p:message for="yieldStrength20"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Коэффициент прочности сварного шва</p:column>
+                                <p:column>&phi;</p:column>
+                                <p:column style="background: blanchedalmond">
+                                    <p:inputText id="weld" type="float" value="#{calcWizardBean.calc.weld}" required="true" label="Коэффициент прочности"/>
+                                    <p:message for="weld"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:panelGrid style="margin-top:20px;
+                                     font-style: italic; font-size: small" >
+                                <f:facet name="header">
+                                    <p:row>
+                                        <p:column colspan="3">Цилиндрическая обечайка</p:column>
+                                    </p:row>
+                                </f:facet>
+
+                                <p:row>
+                                    <p:column>Изгибный момент, Н&middot;мм</p:column>
+                                    <p:column>M</p:column>
+                                    <p:column style="background: blanchedalmond">
+                                        <p:inputText id="bending" value="#{calcWizardBean.calc.bending}" required="true" label="Изгибный момент"/>
+                                        <p:message for="bending"/>
+                                    </p:column>
+                                </p:row>
+
+                                <p:row>
+                                    <p:column>Поперечное сдвиговое усилие, Н</p:column>
+                                    <p:column>Q</p:column>
+                                    <p:column style="background: blanchedalmond">
+                                        <p:inputText id="shift" value="#{calcWizardBean.calc.shift}" required="true" label="Поперечное сдвиговое усилие"/>
+                                        <p:message for="shift"/>
+                                    </p:column>
+                                </p:row>
+
+                                <p:row>
+                                    <p:column>Осевая сила, Н</p:column>
+                                    <p:column>F</p:column>
+                                    <p:column style="background: blanchedalmond">
+                                        <p:inputText id="force" value="#{calcWizardBean.calc.force}" required="true" label="Осевая сила"/>
+                                        <p:message for="force"/>
+                                    </p:column>
+                                </p:row>
+                            </p:panelGrid>
+                        </p:panelGrid>
+                    </p:panel>
+                </p:tab>
+
+            </p:layoutUnit>
+            <p:layoutUnit position="center" resizable="true" size="700" minSize="700" maxSize="700">
+
+                <p:tab id="result" title="Результат">
+                    <p:panel header="Результаты расчетов">
+                        <p:panelGrid style="margin-top:20px;
+                                 font-style: italic; font-size: small">
+                            <f:facet name="header">
+                                <p:row>
+                                    <p:column colspan="1">Параметр</p:column>
+                                    <p:column colspan="1">Формула расчета</p:column>
+                                    <p:column colspan="1">Результат</p:column>
+                                </p:row>
+                            </f:facet>
+
+                            <f:facet name="header">
+                                <p:row>
+                                    <p:column colspan="3">Расчет на прочность на внутреннее давление</p:column>
+                                </p:row>
+                            </f:facet>
+
+                            <p:row>
+                                <p:column>Расчетная толщина, мм</p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {S}_{\tiny p} = \frac{PD}{2\,{\bigl[\normal o\bigr]}^{\tiny T}{\phi}_{\tiny p}-P}"></img>
+                                </p:column>
+                                <p:column> 
+                                    <p:inputText  type="float" id="resThickness" value="#{calcDAO.resThickness}"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. внутреннее
+                                    <br></br>давление из условий
+                                    <br></br>прочности обечайки, МПа
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[P\bigr]} = \frac{2\normal \phi{\bigl[\sigma\bigr]}^{\tiny T}\left(S-C\right)}{D%2BS-C}"></img>
+                                </p:column>
+                                <p:column> 
+                                    <p:inputText  id="resIntPressure" value="#{calcDAO.resIntPressure}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Условия прочности</p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= \bigl[P\bigr] \geq P"></img>
+                                    <br></br>МПа>МПа
+                                    <br></br><b>(выполнено)</b>
+                                    <br></br><img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= S \geq {S}_{\tiny p} %2B C"></img>
+                                    <br></br>мм>мм
+                                    <br></br><b>(выполнено)</b>
+                                </p:column>
+                                <p:column> 
+                                    <h:outputText value="#{calcDAO.resGreaterPressure}" styleClass="outputLabel"/>
+                                    <h:outputText value="#{calcDAO.resGreaterThickness}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column colspan="3" styleClass="ui-widget-header" style="text-align: center">
+                                    Расчет допускаемых внешних нагрузок
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. осевое усилие 
+                                    <br></br>обечайки из условия 
+                                    <br></br>прочности, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{\tiny n} = \pi\left(D%2BS-C\right)\cdot \left(S-C\right){\bigl[\sigma\bigr]}^{\tiny T} "></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resAxialForceStrength}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. осевое сжимающее 
+                                    <br></br>усилие обечайки из  
+                                    <br></br>условия местной 
+                                    <br></br>устойчивости в пределах 
+                                    <br></br>упругости, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{E_1} = \frac{310 \cdot 10^{-6}}{n_y}}D^2 \cdot {\left [ \frac{100 \, \bigl(S-C\bigr)}{D} \right ] \quad}^{2,5}"></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resAxialCompessiveForceLocal}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Гибкость</p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= \lambda = \frac{2,83 \ell_{np}}{D%2BS-C}"></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resFlexibility}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. осевое сжимающее 
+                                    <br></br>усилие обечайки из  
+                                    <br></br>условия общей 
+                                    <br></br>устойчивости в пределах
+                                    <br></br>упругости, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{E_2} = {\bigl[F\bigr]}_{E_1} = "></img>&nbsp;&nbsp;&nbsp;&nbsp;при        
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= \frac{\ell}{D} = %3C 10"></img>
+                                    <br></br><img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{E_2} = \frac{\pi(D%2BS-C)\cdot (S-C)\,E}{n_y} \cdot {\left [ \frac{\pi}{\lambda} \right ] \quad}^{2}="></img>
+                                    <br></br>при&nbsp;<img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= \frac{\ell}{D} = \geq 10"></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resAxialCompessiveForceOverallLess}" styleClass="outputLabel"/>
+                                    <h:outputText value="#{calcWizardBean.calc.resAxialCompessiveForceOverallMore}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. осевое усилие 
+                                    <br></br>обечайки из условия 
+                                    <br></br>устойчивости в пределах
+                                    <br></br>упругости, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{\tiny E} = \min \Bigl\{{\bigl[F\bigr]}_{E_1},{\bigl[F\bigr]}_{E_2}\Bigr\}= "></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resAxialForceElasticity}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Допускаемое осевое 
+                                    <br></br>усилие, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{\tiny BH} = \frac{\bigl[F\bigr]_n}{\sqrt{1%2B {\left ( \frac{\bigl[F\bigr]_n}{\bigl[F\bigr]_E} \right )}^2}}="></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resAxialForcePermissible}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Условия прочности  
+                                    <br></br>цилиндрической обечайки  
+                                    <br></br>на действие осевой 
+                                    <br></br>нагрузки
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{\tiny BH} \geq F"></img>
+                                    <br></br>...H>...H
+                                    <br></br><b>(выполнено)</b>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resStrengthConditionsThrust}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. изгибающий момент   
+                                    <br></br>из условий прочности   
+                                    <br></br>обечайки, Н&middot;мм
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[M\bigr]}_n=\frac{\pi}{4}\left(D%2BS-C\right)\cdot \left(S-C\right){\bigl[\sigma\bigr]}^{\tiny T}="></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resBendingMomentStrength}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. изгибающий момент   
+                                    <br></br>из условий устойчивости  
+                                    <br></br>обечайки в пределах 
+                                    <br></br>упругости, Н&middot;мм
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[M\bigr]}_E=\frac{89\cdot10^{-6}E}{n_y}D^3\cdot {\left [ \frac{100 \, \bigl(S-C\bigr)}{D} \right ] \quad}^{2,5}="></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resBendingMomentElasticity}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Допускаемый изгибающий  
+                                    <br></br>момент, Н&middot;мм
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[M\bigr]}_{\tiny BH} = \frac{\bigl[M\bigr]_n}{\sqrt{1%2B {\left ( \frac{\bigl[M\bigr]_n}{\bigl[M\bigr]_E} \right )}^2}}="></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resBendingMomentPermissible}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Условия прочности  
+                                    <br></br>цилиндрической обечайки  
+                                    <br></br>на действие осевой 
+                                    <br></br>нагрузки
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[M\bigr]}_{\tiny BH} \geq M"></img>
+                                    <br></br>Н&middot;мм > Н&middot;мм
+                                    <br></br><b>(выполнено)</b>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resStrengthConditionsBendingMoment}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. перерезывающая сила  
+                                    <br></br>из условий прочности  
+                                    <br></br>обечайки, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[Q\bigr]}_{\tiny n} = 0,25 \cdot \pi \cdot D \cdot (S-C){\bigl[\sigma\bigr]}^{\tiny T}= "></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resShearForceStrength}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. перерезывающая сила    
+                                    <br></br>из условий устойчивости   
+                                    <br></br>обечайки в пределах  
+                                    <br></br>упругости, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[Q\bigr]}_E=\frac{2,4 \cdot E \cdot {(S-C)}^2}{n_y}\cdot {\left [ 0,18 %2B 3,3 \frac{D(S-C)}{\ell^2} \right ] \quad}="></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resShearForceElasticity}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Допускаемая
+                                    <br></br>перерезывающая сила, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[Q\bigr]}_{\tiny BH} = \frac{\bigl[Q\bigr]_n}{\sqrt{1%2B {\left ( \frac{\bigl[Q\bigr]_n}{\bigl[Q\bigr]_E} \right )}^2}}="></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resShearForcePermissible}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Условия прочности  
+                                    <br></br>цилиндрической обечайки  
+                                    <br></br>на действие 
+                                    <br></br>перерезывающей силы
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[Q\bigr]}_{\tiny BH} \geq Q"></img>
+                                    <br></br>Н > Н
+                                    <br></br><b>(выполнено)</b>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{calcWizardBean.calc.resStrengthConditionsShearForce}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+
+                        </p:panelGrid>
+                    </p:panel>
+                </p:tab>
+
+            </p:layoutUnit>
+        </p:layout>
+    </h:form>
+</html>
+
