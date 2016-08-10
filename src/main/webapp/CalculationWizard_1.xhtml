@@ -48,7 +48,7 @@
                                 <p:column>P<sub>i</sub></p:column>
                                 <p:column style="background: blanchedalmond">
                                     <p:inputText id="intPressure" type="float" value="#{calcWizardBean.calc.intPressure}" label="Расчетное внутреннее давление">
-                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertPressure}" update="resIntPressure" />
+                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertPressure}" update="resThickness resIntPressure resGreaterPressure" />
                                     </p:inputText>
                                     <p:message for="intPressure"/>
                                 </p:column>
@@ -68,7 +68,7 @@
                                 <p:column>T</p:column>
                                 <p:column style="background: blanchedalmond">
                                     <p:inputText id="temp" value="#{calcWizardBean.calc.temp}" required="true" label="Расчетная температура" >
-                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertTemp}" update="lineExpCoeff,tempT,temp20,yieldStrengthT,yieldStrength20,tempResist" />
+                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertTemp}" update="lineExpCoeff tempT temp20 yieldStrengthT yieldStrength20 tempResist resThickness resIntPressure" />
                                     </p:inputText>
                                     <!--<p:watermark for="temp" value="20" />-->
                                     <!--lineExpCoeff,tempT,temp20,yieldStrengthT,yieldStrength20,tempResist-->
@@ -105,7 +105,9 @@
                                 </p:column>
                                 <p:column>D</p:column>
                                 <p:column style="background: blanchedalmond">
-                                    <p:inputText id="diam" value="#{calcWizardBean.calc.diam}" required="true" label="Внутренний диаметр цилиндрической обечайки"/>
+                                    <p:inputText id="diam" value="#{calcWizardBean.calc.diam}" required="true" label="Внутренний диаметр цилиндрической обечайки">
+                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertPressure}" update="resThickness resIntPressure resGreaterPressure" />
+                                    </p:inputText>
                                     <p:message for="diam"/>
                                 </p:column>
                             </p:row>
@@ -232,7 +234,9 @@
                                 <p:column>Коэффициент прочности сварного шва</p:column>
                                 <p:column>&phi;</p:column>
                                 <p:column style="background: blanchedalmond">
-                                    <p:inputText id="weld" type="float" value="#{calcWizardBean.calc.weld}" required="true" label="Коэффициент прочности"/>
+                                    <p:inputText id="weld" type="float" value="#{calcWizardBean.calc.weld}" required="true" label="Коэффициент прочности">
+                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertPressure}" update="resThickness resIntPressure resGreaterPressure" />
+                                    </p:inputText>
                                     <p:message for="weld"/>
                                 </p:column>
                             </p:row>
@@ -316,22 +320,30 @@
                                     <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[P\bigr]} = \frac{2\normal \phi{\bigl[\sigma\bigr]}^{\tiny T}\left(S-C\right)}{D%2BS-C}"></img>
                                 </p:column>
                                 <p:column> 
-                                    <p:inputText type="float" id="resIntPressure" value="#{calcDAO.resIntPressure}" styleClass="outputLabel"/>
+                                    <p:inputText type="float" id="resIntPressure" value="#{calcDAO.resIntPressure}" styleClass="outputLabel">
+                                        <p:ajax event="change" listener="#{calcWizardBean.calc.compareP}" update="resGreaterPressure" />
+                                    </p:inputText>
                                 </p:column>
                             </p:row>
 
                             <p:row>
-                                <p:column>Условия прочности</p:column>
+                                <p:column>Условие прочности</p:column>
                                 <p:column>
                                     <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= \bigl[P\bigr] \geq P"></img>
-                                    <br></br>МПа>МПа
-                                    <br></br><b>(выполнено)</b>
-                                    <br></br><img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= S \geq {S}_{\tiny p} %2B C"></img>
-                                    <br></br>мм>мм
-                                    <br></br><b>(выполнено)</b>
+                                    <br></br>МПа>МПа <b>(выполнено)</b>
                                 </p:column>
                                 <p:column> 
-                                    <h:outputText value="#{calcDAO.resGreaterPressure}" styleClass="outputLabel"/>
+                                    <h:outputText id="resGreaterPressure" value="#{calcDAO.resGreaterPressure}" styleClass="outputLabel"/>
+                                </p:column>
+                            </p:row>
+                            
+                            <p:row>
+                                <p:column>Условие прочности</p:column>
+                                <p:column>    
+                                    <br></br><img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= S \geq {S}_{\tiny p} %2B C"></img>
+                                    <br></br>мм>мм <b>(выполнено)</b>
+                                </p:column>
+                                <p:column> 
                                     <h:outputText value="#{calcDAO.resGreaterThickness}" styleClass="outputLabel"/>
                                 </p:column>
                             </p:row>

@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import dao.MaterialDAO;
+import java.math.MathContext;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -128,6 +129,8 @@ public class CalcDAO implements Serializable {
             writeModule();
             
         }
+        
+        insertPressure();
 //        PreparedStatement stat = conn.prepareStatement("SELECT sigma20,sigmaT FROM calculator.steels WHERE mark = ?");
 //        stat.setString(1, material);
 //        ResultSet res =  stat.executeQuery();
@@ -162,8 +165,16 @@ public class CalcDAO implements Serializable {
     
     public void insertPressure(){
         
-//        resThickness = (intPressure*diam)/(2*tempT*weld-intPressure);
-        setResIntPressure(intPressure);
+        float sigma = temp == 20 ? temp20 : tempT;
+
+        setResThickness((float)(intPressure*diam/(2*sigma*weld-intPressure)));
+        
+        setResIntPressure((float)((2*weld*sigma*(thickness-addThickness))/(diam+thickness-addThickness)));
+        
+        if(!(resIntPressure == null)){
+            compareP();
+            
+        }
         
     }
     
@@ -295,6 +306,11 @@ public class CalcDAO implements Serializable {
             Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+    }
+    
+    public void compareP(){
+        resGreaterPressure = resIntPressure >= intPressure?"Выполнено":"Не выполнено";
+        setResGreaterPressure(resGreaterPressure);
     }
     
     public ArrayList<CalcProfile> getCalcs() throws SQLException, NamingException {
