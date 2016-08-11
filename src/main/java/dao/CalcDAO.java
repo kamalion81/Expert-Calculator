@@ -173,6 +173,7 @@ public class CalcDAO implements Serializable {
         
         if(!(resIntPressure == null)){
             compareP();
+            compareS();
             
         }
         
@@ -311,6 +312,11 @@ public class CalcDAO implements Serializable {
     public void compareP(){
         resGreaterPressure = resIntPressure >= intPressure?"Выполнено":"Не выполнено";
         setResGreaterPressure(resGreaterPressure);
+    }
+    
+    public void compareS(){
+        resGreaterThickness = thickness >= (resThickness+addThickness)?"Выполнено":"Не выполнено";
+        setResGreaterThickness(resGreaterThickness);
     }
     
     public ArrayList<CalcProfile> getCalcs() throws SQLException, NamingException {

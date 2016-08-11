@@ -12,7 +12,7 @@
     <h:form id="form">
         <p:growl id="growl" sticky="true" showDetail="true"/>
         <p:layout  style="min-width:700px; min-height: 1750px; max-width: 1400px" >
-            <p:layoutUnit   position="west" resizable="false" size="700" minSize="700" maxSize="700">
+            <p:layoutUnit   position="west" resizable="true" size="700" minSize="700" maxSize="700">
                 <p:tab id="input" title="Данные">
                     <p:panel header="Входящие данные">
                         <p:panelGrid   style="margin-top: 20px;
@@ -48,7 +48,7 @@
                                 <p:column>P<sub>i</sub></p:column>
                                 <p:column style="background: blanchedalmond">
                                     <p:inputText id="intPressure" type="float" value="#{calcWizardBean.calc.intPressure}" label="Расчетное внутреннее давление">
-                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertPressure}" update="resThickness resIntPressure resGreaterPressure" />
+                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertPressure}" update="resThickness resIntPressure resGreaterPressure resGreaterThickness" />
                                     </p:inputText>
                                     <p:message for="intPressure"/>
                                 </p:column>
@@ -68,7 +68,8 @@
                                 <p:column>T</p:column>
                                 <p:column style="background: blanchedalmond">
                                     <p:inputText id="temp" value="#{calcWizardBean.calc.temp}" required="true" label="Расчетная температура" >
-                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertTemp}" update="lineExpCoeff tempT temp20 yieldStrengthT yieldStrength20 tempResist resThickness resIntPressure" />
+                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertTemp}" update="lineExpCoeff 
+                                                tempT temp20 yieldStrengthT yieldStrength20 tempResist resThickness resIntPressure resGreaterThickness" />
                                     </p:inputText>
                                     <!--<p:watermark for="temp" value="20" />-->
                                     <!--lineExpCoeff,tempT,temp20,yieldStrengthT,yieldStrength20,tempResist-->
@@ -106,7 +107,7 @@
                                 <p:column>D</p:column>
                                 <p:column style="background: blanchedalmond">
                                     <p:inputText id="diam" value="#{calcWizardBean.calc.diam}" required="true" label="Внутренний диаметр цилиндрической обечайки">
-                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertPressure}" update="resThickness resIntPressure resGreaterPressure" />
+                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertPressure}" update="resThickness resIntPressure resGreaterPressure resGreaterThickness" />
                                     </p:inputText>
                                     <p:message for="diam"/>
                                 </p:column>
@@ -235,7 +236,7 @@
                                 <p:column>&phi;</p:column>
                                 <p:column style="background: blanchedalmond">
                                     <p:inputText id="weld" type="float" value="#{calcWizardBean.calc.weld}" required="true" label="Коэффициент прочности">
-                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertPressure}" update="resThickness resIntPressure resGreaterPressure" />
+                                        <p:ajax event="blur" listener="#{calcWizardBean.calc.insertPressure}" update="resThickness resIntPressure resGreaterPressure resGreaterThickness" />
                                     </p:inputText>
                                     <p:message for="weld"/>
                                 </p:column>
@@ -344,7 +345,7 @@
                                     <br></br>мм>мм <b>(выполнено)</b>
                                 </p:column>
                                 <p:column> 
-                                    <h:outputText value="#{calcDAO.resGreaterThickness}" styleClass="outputLabel"/>
+                                    <h:outputText id="resGreaterThickness" value="#{calcDAO.resGreaterThickness}" styleClass="outputLabel"/>
                                 </p:column>
                             </p:row>
 
