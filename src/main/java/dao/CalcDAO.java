@@ -32,25 +32,22 @@ public class CalcDAO implements Serializable {
     //Поля входящих данных
     private String material;
     private Float intPressure;
-    private Float hydroPressure;
     private Integer temp;
     private Float tempT;
-    private Float temp20;
     private Integer diam;
     private Integer thickness;
     private Float corrosion;
     private Float minusTolerance;
     private Float techno;
     private Float addThickness;
-    private Float lineExpCoeff;
     private Float elasticity;
-    private Float yieldStrengthT;
-    private Float tempResist;
-    private Float yieldStrength20;
     private Float weld;
     private Float bending;
     private Float shift;
     private Float force;
+    private Float koef;
+    private Float length;
+    private Float length_pr;
     //Поля результатов
     private Float resThickness;
     private String resGreaterPressure;
@@ -59,23 +56,24 @@ public class CalcDAO implements Serializable {
     private Float resAxialForceStrength;
     private Float resAxialCompessiveForceLocal;
     private Float resFlexibility;
-    private Float resAxialCompessiveForceOverallLess;
-    private Float resAxialCompessiveForceOverallMore;
+    private Float resAxialCompessiveForce;
     private Float resAxialForceElasticity;
     private Float resAxialForcePermissible;
-    private Float resStrengthConditionsThrust;
+    private String resStrengthConditionsThrust;
     private Float resBendingMomentStrength;
     private Float resBendingMomentElasticity;
     private Float resBendingMomentPermissible;
-    private Float resStrengthConditionsBendingMoment;
+    private String resStrengthConditionsBendingMoment;
     private Float resShearForceStrength;
     private Float resShearForceElasticity;
     private Float resShearForcePermissible;
-    private Float resStrengthConditionsShearForce;
+    private String resStrengthConditionsShearForce;
 
     public CalcDAO() {
-       // this.resThickness = new Float(0);
         this.temp = 20;
+        this.koef = (float)2.4;
+        this.length_pr = (float)1;
+        
         
          DataBase db = new DataBase();
          ds = db.getDs();
@@ -84,8 +82,21 @@ public class CalcDAO implements Serializable {
     
     
     
-    public void insertTemp(){
-        
+    public void changeTemp(){
+            
+            if(!(thickness==null)){
+            changeThickness();    
+            }
+            
+            
+            if(!(temp == null)){
+                writeModule();
+            }
+            
+    }
+    
+    public void changeThickness() {
+
         try {
             try (Connection conn = ds.getConnection()) {
                 conn.setAutoCommit(false);
@@ -99,19 +110,25 @@ public class CalcDAO implements Serializable {
 
                     res.next();
                     int material_id = res.getInt("id");
-                    PreparedStatement stat = conn.prepareStatement("SELECT value FROM calculator.koeficient_lineinogo_rashireniya WHERE material_id = ? AND (?<= temp_max AND ?>= temp_min)");
+                    PreparedStatement stat = conn.prepareStatement("SELECT value FROM calculator.dopuskaemoe_napryazhenie WHERE material_id = ? AND temp = ? AND (?<= thickness_max AND ?>= thickness_min)");
                     stat.setInt(1, material_id);
                     stat.setInt(2, getTemp());
-                    stat.setInt(3, getTemp());
+                    stat.setInt(3, getThickness());
+                    stat.setInt(4, getThickness());
                     ResultSet res2 = stat.executeQuery();
-                    if(!res2.next()){
-                        setLineExpCoeff(null);
-                    }
+                    res2.next();
 
-                    setLineExpCoeff((Float) res2.getFloat("value"));
-                    
+//                    if (!res2.next()) {
+//                        setTempT(null);
+//                    }
+
+                    setTempT(res2.getFloat("value"));
+
                     conn.commit();
                     committed = true;
+                }catch(NullPointerException ex){
+                    setTempT(null);
+                    
                 } finally {
                     if (!committed) {
                         conn.rollback();
@@ -120,155 +137,178 @@ public class CalcDAO implements Serializable {
             }
         } catch (SQLException ex) {
             Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (!(thickness == null)) {
-            insertThickness();
-        }
-        
-        if(!(temp == null)){
-            writeModule();
-            
+//        }catch(NullPointerException ex){
+//            setTempT(null);
         }
         
-        insertPressure();
-//        PreparedStatement stat = conn.prepareStatement("SELECT sigma20,sigmaT FROM calculator.steels WHERE mark = ?");
-//        stat.setString(1, material);
-//        ResultSet res =  stat.executeQuery();
-//        res.next();
-        
-//        temp20 = res.getDouble("sigma20");
-//        tempT = res.getDouble("sigmaT");
-        
-        //conn.close();
-    }
-    
-    public void insertThickness(){
-        
-        writeNapryazh_Predel_Soprotiv("dopuskaemoe_napryazhenie");
-        writeNapryazh_Predel_Soprotiv("predel_tekuchesti");
-        writeNapryazh_Predel_Soprotiv("vremennoe_soprotivlenie");
-        
-    }
-    
-    public void insertC(){
-        
-        setCorrosion(getCorrosion() == null ? 0 : getCorrosion());
-        setMinusTolerance(getMinusTolerance() == null ? 0 : getMinusTolerance());
-        setTechno(getTechno() == null ? 0 : getTechno());
-        
-        setAddThickness(getCorrosion() + getMinusTolerance() + getTechno());
-        
-        if(getAddThickness().equals(0)){
-            setAddThickness(null);
-        }
-    }
-    
-    public void insertPressure(){
-        
-        float sigma = temp == 20 ? temp20 : tempT;
+        writeResults();
 
-        setResThickness((float)(intPressure*diam/(2*sigma*weld-intPressure)));
+    }
+    
+    public void changeC(){
         
-        setResIntPressure((float)((2*weld*sigma*(thickness-addThickness))/(diam+thickness-addThickness)));
+        setCorrosion(corrosion == null ? 0 : corrosion);
+        setMinusTolerance(minusTolerance == null ? 0 : minusTolerance);
+        setTechno(techno == null ? 0 : techno);
+        Float result = corrosion + minusTolerance + techno;
         
+        setAddThickness(result == 0 ? null : result);
+        
+        writeResults();
+        
+    }
+    
+    public void writeResults(){
+        
+        
+        try {
+            setResThickness(intPressure * diam / (2 * tempT * weld - intPressure));
+        } catch (NullPointerException ex) {
+            setResThickness(null);
+        }
+
+        try {
+            setResIntPressure((2 * weld * tempT * (thickness - addThickness)) / (diam + thickness - addThickness));
+        } catch (NullPointerException ex) {
+            setResIntPressure(null);
+        }
+       
         if(!(resIntPressure == null)){
             compareP();
             compareS();
             
         }
         
-    }
-    
-    public void writeNapryazh_Predel_Soprotiv(String base){
-       try {
-            try (Connection conn = ds.getConnection()) {
-                conn.setAutoCommit(false);
-                boolean committed = false;
+        try{
+            setResAxialForceStrength((float)Math.PI*(diam+thickness-addThickness)*(thickness-addThickness)*tempT);
+        }catch(NullPointerException ex){
+           setResAxialForceStrength(null); 
+        }
+        
+        try{
+            float part1 = (float) (0.000310 / koef * Math.pow(diam, 2));
+            float part2 = (float) (Math.pow((100 * (thickness - addThickness) / diam), (float) 2.5));
+            setResAxialCompessiveForceLocal(part1 * part2);
+        } catch (NullPointerException ex) {
+            setResAxialCompessiveForceLocal(null);
+        }
+        
+        try{
+            float part = (float)((2.83*length_pr)/(diam+thickness-addThickness));
+            setResFlexibility(part);
+        }catch(NullPointerException ex){
+            setResFlexibility(null);
+        }
+        
+        try {
+            float condition = length / diam;
 
-                try {
+            if (condition < 10) {
+                setResAxialCompessiveForce(resAxialCompessiveForceLocal);
+            } else if (condition >= 10) {
+                float part1 = (float) ((Math.PI * (diam + thickness - addThickness) * (thickness - addThickness) * elasticity) / koef);
+                float part2 = (float) (Math.pow(Math.PI, resFlexibility));
 
-                    PreparedStatement pstat = conn.prepareStatement("SELECT id FROM calculator.materials WHERE matname = ?");
-                    pstat.setString(1, material);
-                    ResultSet res = pstat.executeQuery();
-
-                    res.next();
-                    int material_id = res.getInt("id");
-                    PreparedStatement stat = conn.prepareStatement("SELECT value FROM "+base+" WHERE material_id = ? AND temp = ? AND (?<= thickness_max AND ?>= thickness_min)");
-                    stat.setInt(1, material_id);
-                    stat.setInt(2, getTemp());
-                    stat.setInt(3, getThickness());
-                    stat.setInt(4, getThickness());
-                    ResultSet res2 = stat.executeQuery();
-                    
-                    if (!res2.next()) {
-                        switch (base) {
-                            case "dopuskaemoe_napryazhenie":
-                                if (getTemp() == 20) {
-                                    setTemp20(null);
-                                } else {
-                                    setTempT(null);
-                                }
-                                break;
-                            case "predel_tekuchesti":
-                                if (getTemp() == 20) {
-                                    setYieldStrength20(null);
-                                } else {
-                                    setYieldStrengthT(null);
-                                }
-                                break;
-                            case "vremennoe_soprotivlenie":
-                                setTempResist(null);
-                            default:
-                                break;
-                        }
-                    }
-
-                    if (base.equals("vremennoe_soprotivlenie")) {
-                        setTempResist((Float) res2.getFloat("value"));
-                    }
-
-                    if (getTemp() == 20) {
-                        switch (base) {
-                            case "dopuskaemoe_napryazhenie":
-                                setTemp20((Float) res2.getFloat("value"));
-                                setTempT(null);
-                                break;
-                            case "predel_tekuchesti":
-                                setYieldStrength20((Float) res2.getFloat("value"));
-                                setYieldStrengthT(null);
-                                break;
-                            default:
-                                break;
-                        }
-
-                    } else {
-                        switch (base) {
-                            case "dopuskaemoe_napryazhenie":
-                                setTempT((Float) res2.getFloat("value"));
-                                setTemp20(null);
-                                break;
-                            case "predel_tekuchesti":
-                                setYieldStrengthT((Float) res2.getFloat("value"));
-                                setYieldStrength20(null);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
-                    
-
-                    conn.commit();
-                    committed = true;
-                } finally {
-                    if (!committed) {
-                        conn.rollback();
-                    }
-                }
+                setResAxialCompessiveForce(part1 * part2);
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
-        }  
+
+        } catch (NullPointerException ex) {
+            setResAxialCompessiveForce(null);
+        }
+        
+        try{
+            setResAxialForceElasticity(Math.min(resAxialCompessiveForceLocal, resAxialCompessiveForce)); 
+        }catch(NullPointerException ex){
+           setResAxialForceElasticity(null); 
+        }
+            
+        try{
+            float part1 = (float) Math.pow((resAxialForceStrength/resAxialForceElasticity),2);
+            float part2 = (float) Math.sqrt(1+part1);
+            
+            setResAxialForcePermissible((float)resAxialForceStrength/part2);
+            
+        }catch(NullPointerException ex){
+            setResAxialForcePermissible(null);
+        }
+        
+        try{
+           resStrengthConditionsThrust = resAxialForcePermissible>= force? "Выполнено":"Не выполнено";
+           
+            
+        }catch(NullPointerException ex){
+            setResStrengthConditionsThrust(null);
+        }
+        
+        try{
+            float part = (float)((Math.PI/4)*(diam+thickness-addThickness)*(thickness-addThickness)*tempT);
+            setResBendingMomentStrength(part);
+            
+        }catch(NullPointerException ex){
+            setResBendingMomentStrength(null);
+        }
+        
+        try{
+            
+            float part1 = (float)(((0.000089*elasticity)/koef)*Math.pow(diam, 3));
+            float part2 = (float)(Math.pow(((100*(thickness-addThickness))/diam),2.5));
+            
+            setResBendingMomentElasticity(part1*part2);
+            
+        }catch(NullPointerException ex){
+            setResBendingMomentElasticity(null);
+        }
+        
+        try{
+            
+            float part = (float) Math.sqrt(1+ Math.pow(resBendingMomentStrength/resBendingMomentElasticity, 2));
+            setResBendingMomentPermissible(resBendingMomentStrength/part);
+            
+        }catch(NullPointerException ex){
+          setResBendingMomentPermissible(null);  
+        }
+        
+        try{
+            resStrengthConditionsBendingMoment = resBendingMomentPermissible >= bending?"Выполнено":"Не выполнено";
+        }catch(NullPointerException ex){
+           setResStrengthConditionsBendingMoment(null); 
+        }
+        
+        try{
+            
+            float part = (float) (0.25*Math.PI*diam*(thickness-addThickness)*tempT);
+            setResShearForceStrength(part);        
+            
+        }catch(NullPointerException ex){
+            setResShearForceStrength(null);        
+        }
+        
+        try{
+            float part1 = (float)((2.4*elasticity*(thickness-addThickness)*tempT)/koef);
+            float part2 = (float)Math.abs(0.18+3.3*((diam*(thickness-addThickness))/(Math.pow(length, 2))));
+            setResShearForceElasticity(part1*part2);
+            
+        }catch(NullPointerException ex){
+            setResShearForceElasticity(null);
+        }
+        
+        try{
+            float part = (float) Math.sqrt(1+ Math.pow(resShearForceStrength/resShearForceElasticity, 2));
+            setResBendingMomentPermissible(resShearForceStrength/part);
+            
+            setResShearForcePermissible(part);
+            
+        }catch(NullPointerException ex){
+            setResShearForcePermissible(null);
+        }
+        
+        try{
+            resStrengthConditionsShearForce = resShearForcePermissible >= shift?"Выполнено":"Не выполнено";
+            
+        }catch(NullPointerException ex){
+            setResStrengthConditionsShearForce(null);
+        }
+        
     }
     
     public void writeModule(){
@@ -289,14 +329,20 @@ public class CalcDAO implements Serializable {
                     stat.setInt(1, getTemp());
                     stat.setInt(2, group_id);
                     ResultSet res2 = stat.executeQuery();
-                    if(!res2.next()){
-                        setElasticity(null);
-                    }
+                    res2.next();
+//                    if(!res2.next()){
+//                        setElasticity(null);
+//                    }
 
-                    setElasticity((Float) res2.getFloat("value"));
+                    setElasticity(res2.getFloat("value"));
                     
                     conn.commit();
                     committed = true;
+                }catch(NullPointerException ex){
+                    setElasticity(null);
+                    
+                    
+                    
                 } finally {
                     if (!committed) {
                         conn.rollback();
@@ -306,17 +352,30 @@ public class CalcDAO implements Serializable {
         } catch (SQLException ex) {
             Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
+//        catch(NullPointerException ex){
+//            setElasticity(null);
+//        }
+        
         
     }
     
     public void compareP(){
+        try{
         resGreaterPressure = resIntPressure >= intPressure?"Выполнено":"Не выполнено";
         setResGreaterPressure(resGreaterPressure);
+        }catch(NullPointerException ex){
+           setResGreaterPressure(null); 
+        }
     }
     
     public void compareS(){
+        try{
         resGreaterThickness = thickness >= (resThickness+addThickness)?"Выполнено":"Не выполнено";
         setResGreaterThickness(resGreaterThickness);
+        }catch(NullPointerException ex){
+          setResGreaterThickness(null);  
+        }
+        
     }
     
     public ArrayList<CalcProfile> getCalcs() throws SQLException, NamingException {
@@ -337,15 +396,13 @@ public class CalcDAO implements Serializable {
 
     }
 
-
     /**
      * @return the intPressure
      */
     public Float getIntPressure() { 
-        return intPressure;
+        
+        return intPressure ;
     }
-
-    
 
     /**
      * @param diam the diam to set
@@ -365,7 +422,35 @@ public class CalcDAO implements Serializable {
      * @param corrosion the corrosion to set
      */
     public void setCorrosion(Float corrosion) {
-        this.corrosion = corrosion;
+        
+         this.corrosion = corrosion;
+         
+         //calculateThickness();
+        
+        
+        
+        
+        
+       
+    }
+    
+    public void calculateThickness(){
+        
+        
+        
+        float corrosion = this.corrosion == null ? 0 : this.corrosion;
+        
+        float MinusTolerance = getMinusTolerance() == null ? 0 : getMinusTolerance();
+        float Techno = (getTechno() == null ? 0 : getTechno()); 
+        
+        float sum = corrosion + MinusTolerance + Techno;
+        
+        if(sum == 0){
+            setAddThickness(null);
+        }
+        else{
+            addThickness = sum;
+        }
     }
 
     /**
@@ -386,42 +471,17 @@ public class CalcDAO implements Serializable {
      * @param addThickness the addThickness to set
      */
     public void setAddThickness(Float addThickness) {
+        
+        
         this.addThickness = addThickness;
     }
 
-    /**
-     * @param lineExpCoeff the lineExpCoeff to set
-     */
-    public void setLineExpCoeff(Float lineExpCoeff) {
-        this.lineExpCoeff = lineExpCoeff;
-    }
 
     /**
      * @param elasticity the elasticity to set
      */
     public void setElasticity(Float elasticity) {
         this.elasticity = elasticity;
-    }
-
-    /**
-     * @param yieldStrength the yieldStrengthT to set
-     */
-    public void setYieldStrengthT(Float yieldStrength) {
-        this.yieldStrengthT = yieldStrength;
-    }
-
-    /**
-     * @param tempResist the tempResist to set
-     */
-    public void setTempResist(Float tempResist) {
-        this.tempResist = tempResist;
-    }
-
-    /**
-     * @param yieldStrength20 the yieldStrength20 to set
-     */
-    public void setYieldStrength20(Float yieldStrength20) {
-        this.yieldStrength20 = yieldStrength20;
     }
 
     /**
@@ -510,33 +570,6 @@ public class CalcDAO implements Serializable {
         this.resFlexibility = resFlexibility;
     }
 
-    /**
-     * @return the resAxialCompessiveForceOverallLess
-     */
-    public Float getResAxialCompessiveForceOverallLess() {
-        return resAxialCompessiveForceOverallLess;
-    }
-
-    /**
-     * @param resAxialCompessiveForceOverallLess the resAxialCompessiveForceOverallLess to set
-     */
-    public void setResAxialCompessiveForceOverallLess(Float resAxialCompessiveForceOverallLess) {
-        this.resAxialCompessiveForceOverallLess = resAxialCompessiveForceOverallLess;
-    }
-
-    /**
-     * @return the resAxialCompessiveForceOverallMore
-     */
-    public Float getResAxialCompessiveForceOverallMore() {
-        return resAxialCompessiveForceOverallMore;
-    }
-
-    /**
-     * @param resAxialCompessiveForceOverallMore the resAxialCompessiveForceOverallMore to set
-     */
-    public void setResAxialCompessiveForceOverallMore(Float resAxialCompessiveForceOverallMore) {
-        this.resAxialCompessiveForceOverallMore = resAxialCompessiveForceOverallMore;
-    }
 
     /**
      * @return the resAxialForceElasticity
@@ -569,14 +602,14 @@ public class CalcDAO implements Serializable {
     /**
      * @return the resStrengthConditionsThrust
      */
-    public Float getResStrengthConditionsThrust() {
+    public String getResStrengthConditionsThrust() {
         return resStrengthConditionsThrust;
     }
 
     /**
      * @param resStrengthConditionsThrust the resStrengthConditionsThrust to set
      */
-    public void setResStrengthConditionsThrust(Float resStrengthConditionsThrust) {
+    public void setResStrengthConditionsThrust(String resStrengthConditionsThrust) {
         this.resStrengthConditionsThrust = resStrengthConditionsThrust;
     }
 
@@ -625,14 +658,14 @@ public class CalcDAO implements Serializable {
     /**
      * @return the resStrengthConditionsBendingMoment
      */
-    public Float getResStrengthConditionsBendingMoment() {
+    public String getResStrengthConditionsBendingMoment() {
         return resStrengthConditionsBendingMoment;
     }
 
     /**
      * @param resStrengthConditionsBendingMoment the resStrengthConditionsBendingMoment to set
      */
-    public void setResStrengthConditionsBendingMoment(Float resStrengthConditionsBendingMoment) {
+    public void setResStrengthConditionsBendingMoment(String resStrengthConditionsBendingMoment) {
         this.resStrengthConditionsBendingMoment = resStrengthConditionsBendingMoment;
     }
 
@@ -681,14 +714,14 @@ public class CalcDAO implements Serializable {
     /**
      * @return the resStrengthConditionsShearForce
      */
-    public Float getResStrengthConditionsShearForce() {
+    public String getResStrengthConditionsShearForce() {
         return resStrengthConditionsShearForce;
     }
 
     /**
      * @param resStrengthConditionsShearForce the resStrengthConditionsShearForce to set
      */
-    public void setResStrengthConditionsShearForce(Float resStrengthConditionsShearForce) {
+    public void setResStrengthConditionsShearForce(String resStrengthConditionsShearForce) {
         this.resStrengthConditionsShearForce = resStrengthConditionsShearForce;
     }
 
@@ -704,20 +737,6 @@ public class CalcDAO implements Serializable {
      */
     public void setMaterial(String material) {
         this.material = material;
-    }
-
-    /**
-     * @return the hydroPressure
-     */
-    public Float getHydroPressure() {
-        return hydroPressure;
-    }
-
-    /**
-     * @param hydroPressure the hydroPressure to set
-     */
-    public void setHydroPressure(Float hydroPressure) {
-        this.hydroPressure = hydroPressure;
     }
 
     /**
@@ -748,19 +767,6 @@ public class CalcDAO implements Serializable {
         this.tempT = tempT;
     }
 
-    /**
-     * @return the temp20
-     */
-    public Float getTemp20() {
-        return temp20;
-    }
-
-    /**
-     * @param temp20 the temp20 to set
-     */
-    public void setTemp20(Float temp20) {
-        this.temp20 = temp20;
-    }
 
     /**
      * @return the diam
@@ -804,12 +810,6 @@ public class CalcDAO implements Serializable {
         return addThickness;
     }
 
-    /**
-     * @return the lineExpCoeff
-     */
-    public Float getLineExpCoeff() {
-        return lineExpCoeff;
-    }
 
     /**
      * @return the elasticity
@@ -818,26 +818,7 @@ public class CalcDAO implements Serializable {
         return elasticity;
     }
 
-    /**
-     * @return the yieldStrengthT
-     */
-    public Float getYieldStrengthT() {
-        return yieldStrengthT;
-    }
 
-    /**
-     * @return the tempResist
-     */
-    public Float getTempResist() {
-        return tempResist;
-    }
-
-    /**
-     * @return the yieldStrength20
-     */
-    public Float getYieldStrength20() {
-        return yieldStrength20;
-    }
 
     /**
      * @return the weld
@@ -914,6 +895,62 @@ public class CalcDAO implements Serializable {
      */
     public void setIntPressure(Float intPressure) {
         this.intPressure = intPressure;
+    }
+
+    /**
+     * @return the koef
+     */
+    public Float getKoef() {
+        return koef;
+    }
+
+    /**
+     * @param koef the koef to set
+     */
+    public void setKoef(Float koef) {
+        this.koef = koef;
+    }
+
+    /**
+     * @return the length
+     */
+    public Float getLength() {
+        return length;
+    }
+
+    /**
+     * @param length the length to set
+     */
+    public void setLength(Float length) {
+        this.length = length;
+    }
+
+    /**
+     * @return the length_pr
+     */
+    public Float getLength_pr() {
+        return length_pr;
+    }
+
+    /**
+     * @param length_pr the length_pr to set
+     */
+    public void setLength_pr(Float length_pr) {
+        this.length_pr = length_pr;
+    }
+
+    /**
+     * @return the resAxialCompessiveForce
+     */
+    public Float getResAxialCompessiveForce() {
+        return resAxialCompessiveForce;
+    }
+
+    /**
+     * @param resAxialCompessiveForce the resAxialCompessiveForce to set
+     */
+    public void setResAxialCompessiveForce(Float resAxialCompessiveForce) {
+        this.resAxialCompessiveForce = resAxialCompessiveForce;
     }
 
 }

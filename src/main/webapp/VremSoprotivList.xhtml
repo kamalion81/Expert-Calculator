@@ -12,6 +12,9 @@
         
         <h:form id="form">
             <p:growl id="growl" showDetail="false"/>
+            <p:button outcome="MainMenu" value="Назад в меню" icon="fa fa-fw fa-arrow-left"/>
+            <br></br>
+            <br></br>
             <p:dataTable id="Dt" var="vrem_sopr" value="#{vremSoprotivBean.values}" editable="true"
                          paginator="true" rows="20"  selection="#{vremSoprotivBean.selectedValue}" rowKey="#{vrem_sopr.id}">
 

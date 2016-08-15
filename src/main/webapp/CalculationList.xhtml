@@ -11,6 +11,9 @@
     </h:head>
     <h:body>
         <h:form>
+            <p:button outcome="MainMenu" value="Назад в меню" icon="fa fa-fw fa-arrow-left"/>
+            <br></br>
+            <br></br>
             <p:dataTable value="#{calcsBean.lazyModel}" var="calc" paginator="true" rows="20" styleClass="paginated" lazy="true">
                 <f:facet name="header">
                     Список расчетов

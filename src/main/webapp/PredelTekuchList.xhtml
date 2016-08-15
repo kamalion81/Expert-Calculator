@@ -12,6 +12,9 @@
         
         <h:form id="form">
             <p:growl id="growl" showDetail="false"/>
+            <p:button outcome="MainMenu" value="Назад в меню" icon="fa fa-fw fa-arrow-left"/>
+            <br></br>
+            <br></br>
             <p:dataTable id="Dt" var="pred_tek" value="#{predelTekuchBean.values}" editable="true"
                          paginator="true" rows="20"  selection="#{predelTekuchBean.selectedValue}" rowKey="#{pred_tek.id}">
 
