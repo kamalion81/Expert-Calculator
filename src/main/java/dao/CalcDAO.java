@@ -1,7 +1,6 @@
 package dao;
 
 
-import profiles.CalcProfile;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -11,7 +10,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
@@ -19,15 +22,17 @@ import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.naming.NamingException;
 import javax.sql.*;
-import profiles.MaterialProfile;
+import profiles.CalcProfile;
 
 @ManagedBean
 @ApplicationScoped
 public class CalcDAO implements Serializable {
     
     private DataSource ds;
+    
 
     //Поля входящих данных
     private String material;
@@ -80,7 +85,67 @@ public class CalcDAO implements Serializable {
         
     }
     
-    
+    public List<CalcProfile> getCalcs(){
+        
+        List<CalcProfile> calcs = new ArrayList<>();
+        try {
+            try (Connection conn = ds.getConnection()) {
+                Statement stat = conn.createStatement();
+                String query = "SELECT `calcs`.`id`,"
+                        + "    `calcs`.`name`,"
+                        + "    `calcs`.`date`,"
+                        + "    `materials`.`matname`,"
+                        + "    `calcs`.`intPressure`,"
+                        + "    `calcs`.`temp`,"
+                        + "    `calcs`.`tempT`,"
+                        + "    `calcs`.`diam`,"
+                        + "    `calcs`.`thickness`,"
+                        + "    `calcs`.`corrosion`,"
+                        + "    `calcs`.`minusTolerance`,"
+                        + "    `calcs`.`techno`,"
+                        + "    `calcs`.`addThickness`,"
+                        + "    `calcs`.`elasticity`,"
+                        + "    `calcs`.`weld`,"
+                        + "    `calcs`.`koef`,"
+                        + "    `calcs`.`length`,"
+                        + "    `calcs`.`length_pr`,"
+                        + "    `calcs`.`bending`,"
+                        + "    `calcs`.`shift`,"
+                        + "    `calcs`.`force`,"
+                        + "    `calcs`.`resThickness`,"
+                        + "    `calcs`.`resIntPressure`,"
+                        + "    `calcs`.`resGreaterPressure`,"
+                        + "    `calcs`.`resGreaterThickness`,"
+                        + "    `calcs`.`resAxialForceStrength`,"
+                        + "    `calcs`.`resAxialCompessiveForceLocal`,"
+                        + "    `calcs`.`resFlexibility`,"
+                        + "    `calcs`.`resAxialCompessiveForce`,"
+                        + "    `calcs`.`resAxialForceElasticity`,"
+                        + "    `calcs`.`resAxialForcePermissible`,"
+                        + "    `calcs`.`resStrengthConditionsThrust`,"
+                        + "    `calcs`.`resBendingMomentStrength`,"
+                        + "    `calcs`.`resBendingMomentElasticity`,"
+                        + "    `calcs`.`resBendingMomentPermissible`,"
+                        + "    `calcs`.`resStrengthConditionsBendingMoment`,"
+                        + "    `calcs`.`resShearForceStrength`,"
+                        + "    `calcs`.`resShearForceElasticity`,"
+                        + "    `calcs`.`resShearForcePermissible`,"
+                        + "    `calcs`.`resStrengthConditionsShearForce`"
+                        + "FROM `calculator`.`calcs` INNER JOIN `calculator`.`materials` ON `calcs`.`materials_id` = `materials`.`id`";
+                ResultSet result = stat.executeQuery(query);
+                while (result.next()) {
+                    CalcProfile profile = new CalcProfile(result.getInt("id"),result.getDate("date"), result.getString("name"));
+                    calcs.add(profile);
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return calcs;
+        
+        
+        
+    }
     
     public void changeTemp(){
             
@@ -117,12 +182,11 @@ public class CalcDAO implements Serializable {
                     stat.setInt(4, getThickness());
                     ResultSet res2 = stat.executeQuery();
                     res2.next();
-
-//                    if (!res2.next()) {
-//                        setTempT(null);
-//                    }
-
-                    setTempT(res2.getFloat("value"));
+                    
+                    BigDecimal x = new BigDecimal(res2.getFloat("value"));
+                    x = x.setScale(2, BigDecimal.ROUND_HALF_UP);
+                    
+                    setTempT(x.floatValue());
 
                     conn.commit();
                     committed = true;
@@ -137,8 +201,6 @@ public class CalcDAO implements Serializable {
             }
         } catch (SQLException ex) {
             Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
-//        }catch(NullPointerException ex){
-//            setTempT(null);
         }
         
         writeResults();
@@ -152,7 +214,10 @@ public class CalcDAO implements Serializable {
         setTechno(techno == null ? 0 : techno);
         Float result = corrosion + minusTolerance + techno;
         
-        setAddThickness(result == 0 ? null : result);
+        BigDecimal x = new BigDecimal(result);
+        x = x.setScale(2, BigDecimal.ROUND_HALF_UP);
+        
+        setAddThickness(result == 0 ? null : x.floatValue());
         
         writeResults();
         
@@ -378,23 +443,143 @@ public class CalcDAO implements Serializable {
         
     }
     
-    public ArrayList<CalcProfile> getCalcs() throws SQLException, NamingException {
+    public void save(ActionEvent actionEvent) {
         
-//        data = new DataBase();
-//
-        ArrayList<CalcProfile> calcs = new ArrayList<>();
-//        //Connection conn = data.getdbConnection();
-//        PreparedStatement stat = conn.prepareStatement("SELECT * FROM calculator.calcs");
-//
-//        ResultSet result = stat.executeQuery();
-//        while (result.next()) {
-//            CalcProfile profile = new CalcProfile(result.getInt("id"), result.getDate("date"), result.getString("name"));
-//            calcs.add(profile);
-//        }
-//
-        return calcs;
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
+        String data = format.format(cal.getTime());
+        
+        
+
+        try {
+            try (Connection conn = ds.getConnection()) {
+                conn.setAutoCommit(false);
+                boolean committed = false;
+                
+                
+                PreparedStatement stat = conn.prepareStatement("SELECT id FROM calculator.materials where matname = ?");
+                        stat.setString(1, material);
+                        ResultSet res = stat.executeQuery();
+
+                        res.next();
+                        int material_id = res.getInt("id");
+                
+                
+                
+                try{
+                
+                String query = "INSERT INTO `calculator`.`calcs`"
+                        + "(`name`,"
+                        + "`date`,"
+                        + "`materials_id`,"
+                        + "`intPressure`,"
+                        + "`temp`,"
+                        + "`tempT`,"
+                        + "`diam`,"
+                        + "`thickness`,"
+                        + "`corrosion`,"
+                        + "`minusTolerance`,"
+                        + "`techno`,"
+                        + "`addThickness`,"
+                        + "`elasticity`,"
+                        + "`weld`,"
+                        + "`koef`,"
+                        + "`length`,"
+                        + "`length_pr`,"
+                        + "`bending`,"
+                        + "`shift`,"
+                        + "`force`,"
+                        + "`resThickness`,"
+                        + "`resIntPressure`,"
+                        + "`resGreaterPressure`,"
+                        + "`resGreaterThickness`,"
+                        + "`resAxialForceStrength`,"
+                        + "`resAxialCompessiveForceLocal`,"
+                        + "`resFlexibility`,"
+                        + "`resAxialCompessiveForce`,"
+                        + "`resAxialForceElasticity`,"
+                        + "`resAxialForcePermissible`,"
+                        + "`resStrengthConditionsThrust`,"
+                        + "`resBendingMomentStrength`,"
+                        + "`resBendingMomentElasticity`,"
+                        + "`resBendingMomentPermissible`,"
+                        + "`resStrengthConditionsBendingMoment`,"
+                        + "`resShearForceStrength`,"
+                        + "`resShearForceElasticity`,"
+                        + "`resShearForcePermissible`,"
+                        + "`resStrengthConditionsShearForce`)"
+                        + "VALUES"
+                        + "('Расчет',"
+                        + "'"+data+"',"
+                        + material_id+","
+                        + intPressure+","
+                        + temp+","
+                        + tempT+","
+                        + diam+","
+                        + thickness+","
+                        + corrosion+","
+                        + minusTolerance+","
+                        + techno+","
+                        + addThickness+","
+                        + elasticity+","
+                        + weld+","
+                        + koef+","
+                        + length+","
+                        + length_pr+","
+                        + bending+","
+                        + shift+","
+                        + force+","
+                        + resThickness+","
+                        + resIntPressure+","
+                        + "'"+resGreaterPressure+"',"
+                        + "'"+resGreaterThickness+"',"
+                        + resAxialForceStrength+","
+                        + resAxialCompessiveForceLocal+","
+                        + resFlexibility+","
+                        + resAxialCompessiveForce+","
+                        + resAxialForceElasticity+","
+                        + resAxialForcePermissible+","
+                        + "'"+resStrengthConditionsThrust+"',"
+                        + resBendingMomentStrength+","
+                        + resBendingMomentElasticity+","
+                        + resBendingMomentPermissible+","
+                        + "'"+resStrengthConditionsBendingMoment+"',"
+                        + resShearForceStrength+","
+                        + resShearForceElasticity+","
+                        + resShearForcePermissible+","
+                        + "'"+resStrengthConditionsShearForce+"')";
+                PreparedStatement stat2 = conn.prepareStatement(query);
+
+                        stat2.executeUpdate();
+                        
+                        conn.commit();
+                        committed = true;
+                        
+                }finally{
+                        if (!committed) {
+                            conn.rollback();
+                        }
+                    
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+            addMessage("Не все значения заполнены, данные не сохранены");
+            return;
+        }
+        
+        
+        addMessage("Данные сохранены");
+        
+        
     }
+     
+    public void addMessage(String summary) {
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, summary,  null);
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+    
 
     /**
      * @return the intPressure

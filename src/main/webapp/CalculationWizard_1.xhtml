@@ -16,10 +16,15 @@
         
         <h:form id="form">
             <p:growl id="growl" sticky="true" showDetail="true"/>
-            <p:button outcome="MainMenu" value="Назад в меню" icon="fa fa-fw fa-arrow-left"/>
+            <p:toolbar>
+                <f:facet name="left">
+                    <p:button outcome="MainMenu" value="Назад в меню" icon="fa fa-fw fa-arrow-left"/>
+                    <p:commandButton value="Сохранить" id="withIcon" actionListener="#{calcDAO.save}" update="growl" icon="ui-icon-disk" />
+                </f:facet>
+            </p:toolbar>
             <br></br>
             <br></br>
-            <p:layout  style="min-width:1349px; max-width: 1349px; min-height: 1527px; max-height: 1527px" >
+            <p:layout  style="min-width:1300px; max-width: 1300px; min-height: 1527px; max-height: 1527px" >
                 <p:layoutUnit   header="Входящие данные" position="west" resizable="false" size="600" minSize="600" maxSize="600">
                     <p:panelGrid  id="input" style="margin-top: 20px;
                                     font-style: italic; font-size: small">
@@ -304,7 +309,9 @@
                                 <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {S}_{\tiny p} = \frac{PD}{2\,{\bigl[\normal o\bigr]}^{\tiny T}{\phi}_{\tiny p}-P}"></img>
                             </p:column>
                             <p:column> 
-                                <h:outputText id="resThickness" value="#{calcDAO.resThickness}"/>
+                                <h:outputText id="resThickness" value="#{calcDAO.resThickness}">
+                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                </h:outputText>
                             </p:column>
                         </p:row>
 
@@ -317,7 +324,9 @@
                                 <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[P\bigr]} = \frac{2\normal \phi{\bigl[\sigma\bigr]}^{\tiny T}\left(S-C\right)}{D%2BS-C}"></img>
                             </p:column>
                             <p:column> 
-                                <h:outputText id="resIntPressure" value="#{calcDAO.resIntPressure}" styleClass="outputLabel"/>
+                                <h:outputText id="resIntPressure" value="#{calcDAO.resIntPressure}" styleClass="outputLabel">
+                                   <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                </h:outputText>
                             </p:column>
                         </p:row>
 
@@ -358,7 +367,9 @@
                                 <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{\tiny n} = \pi\left(D%2BS-C\right)\cdot \left(S-C\right){\bigl[\sigma\bigr]}^{\tiny T} "></img>
                             </p:column>
                             <p:column>
-                                <h:outputText id="resAxialForceStrength" value="#{calcWizardBean.calc.resAxialForceStrength}" styleClass="outputLabel"/>
+                                <h:outputText id="resAxialForceStrength" value="#{calcWizardBean.calc.resAxialForceStrength}" styleClass="outputLabel">
+                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                </h:outputText>
                             </p:column>
                         </p:row>
 
@@ -373,7 +384,9 @@
                                 <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{E_1} = \frac{310 \cdot 10^{-6}}{n_y}}D^2 \cdot {\left [ \frac{100 \, \bigl(S-C\bigr)}{D} \right ] \quad}^{2,5}"></img>
                             </p:column>
                             <p:column>
-                                <h:outputText id="resAxialCompessiveForceLocal" value="#{calcWizardBean.calc.resAxialCompessiveForceLocal}" styleClass="outputLabel"/>
+                                <h:outputText id="resAxialCompessiveForceLocal" value="#{calcWizardBean.calc.resAxialCompessiveForceLocal}" styleClass="outputLabel">
+                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                </h:outputText>
                             </p:column>
                         </p:row>
 
@@ -383,7 +396,9 @@
                                 <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= \lambda = \frac{2,83 \ell_{np}}{D%2BS-C}"></img>
                             </p:column>
                             <p:column>
-                                <h:outputText id="resFlexibility" value="#{calcWizardBean.calc.resFlexibility}" styleClass="outputLabel"/>
+                                <h:outputText id="resFlexibility" value="#{calcWizardBean.calc.resFlexibility}" styleClass="outputLabel">
+                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                </h:outputText>
                             </p:column>
                         </p:row>
 
@@ -401,7 +416,9 @@
                                 <br></br>при&nbsp;<img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= \frac{\ell}{D} = \geq 10"></img>
                             </p:column>
                             <p:column>
-                                <h:outputText value="#{calcWizardBean.calc.resAxialCompessiveForce}" styleClass="outputLabel"/>
+                                <h:outputText id="resAxialCompessiveForce" value="#{calcWizardBean.calc.resAxialCompessiveForce}" styleClass="outputLabel">
+                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                </h:outputText>
                             </p:column>
                         </p:row>
 
@@ -415,7 +432,9 @@
                                 <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{\tiny E} = \min \Bigl\{{\bigl[F\bigr]}_{E_1},{\bigl[F\bigr]}_{E_2}\Bigr\}= "></img>
                             </p:column>
                             <p:column>
-                                <h:outputText id="resAxialForceElasticity" value="#{calcWizardBean.calc.resAxialForceElasticity}" styleClass="outputLabel"/>
+                                <h:outputText id="resAxialForceElasticity" value="#{calcWizardBean.calc.resAxialForceElasticity}" styleClass="outputLabel">
+                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                </h:outputText>
                             </p:column>
                         </p:row>
 
@@ -427,7 +446,9 @@
                                 <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{\tiny BH} = \frac{\bigl[F\bigr]_n}{\sqrt{1%2B {\left ( \frac{\bigl[F\bigr]_n}{\bigl[F\bigr]_E} \right )}^2}}="></img>
                             </p:column>
                             <p:column>
-                                <h:outputText id="resAxialForcePermissible" value="#{calcWizardBean.calc.resAxialForcePermissible}" styleClass="outputLabel"/>
+                                <h:outputText id="resAxialForcePermissible" value="#{calcWizardBean.calc.resAxialForcePermissible}" styleClass="outputLabel">
+                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                </h:outputText>
                             </p:column>
                         </p:row>
 
@@ -456,7 +477,9 @@
                                 <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[M\bigr]}_n=\frac{\pi}{4}\left(D%2BS-C\right)\cdot \left(S-C\right){\bigl[\sigma\bigr]}^{\tiny T}="></img>
                             </p:column>
                             <p:column>
-                                <h:outputText id="resBendingMomentStrength" value="#{calcWizardBean.calc.resBendingMomentStrength}" styleClass="outputLabel"/>
+                                <h:outputText id="resBendingMomentStrength" value="#{calcWizardBean.calc.resBendingMomentStrength}" styleClass="outputLabel">
+                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                </h:outputText>
                             </p:column>
                         </p:row>
 
@@ -470,7 +493,9 @@
                                 <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[M\bigr]}_E=\frac{89\cdot10^{-6}E}{n_y}D^3\cdot {\left [ \frac{100 \, \bigl(S-C\bigr)}{D} \right ] \quad}^{2,5}="></img>
                             </p:column>
                             <p:column>
-                                <h:outputText id="resBendingMomentElasticity" value="#{calcWizardBean.calc.resBendingMomentElasticity}" styleClass="outputLabel"/>
+                                <h:outputText id="resBendingMomentElasticity" value="#{calcWizardBean.calc.resBendingMomentElasticity}" styleClass="outputLabel">
+                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                </h:outputText>
                             </p:column>
                         </p:row>
 
@@ -482,7 +507,9 @@
                                 <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[M\bigr]}_{\tiny BH} = \frac{\bigl[M\bigr]_n}{\sqrt{1%2B {\left ( \frac{\bigl[M\bigr]_n}{\bigl[M\bigr]_E} \right )}^2}}="></img>
                             </p:column>
                             <p:column>
-                                <h:outputText id="resBendingMomentPermissible" value="#{calcWizardBean.calc.resBendingMomentPermissible}" styleClass="outputLabel"/>
+                                <h:outputText id="resBendingMomentPermissible" value="#{calcWizardBean.calc.resBendingMomentPermissible}" styleClass="outputLabel">
+                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                </h:outputText>
                             </p:column>
                         </p:row>
 
@@ -511,7 +538,9 @@
                                 <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[Q\bigr]}_{\tiny n} = 0,25 \cdot \pi \cdot D \cdot (S-C){\bigl[\sigma\bigr]}^{\tiny T}= "></img>
                             </p:column>
                             <p:column>
-                                <h:outputText id="resShearForceStrength" value="#{calcWizardBean.calc.resShearForceStrength}" styleClass="outputLabel"/>
+                                <h:outputText id="resShearForceStrength" value="#{calcWizardBean.calc.resShearForceStrength}" styleClass="outputLabel">
+                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                </h:outputText>
                             </p:column>
                         </p:row>
 
@@ -525,7 +554,9 @@
                                 <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[Q\bigr]}_E=\frac{2,4 \cdot E \cdot {(S-C)}^2}{n_y}\cdot {\left [ 0,18 %2B 3,3 \frac{D(S-C)}{\ell^2} \right ] \quad}="></img>
                             </p:column>
                             <p:column>
-                                <h:outputText id="resShearForceElasticity" value="#{calcWizardBean.calc.resShearForceElasticity}" styleClass="outputLabel"/>
+                                <h:outputText id="resShearForceElasticity" value="#{calcWizardBean.calc.resShearForceElasticity}" styleClass="outputLabel">
+                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                </h:outputText>
                             </p:column>
                         </p:row>
 
@@ -537,7 +568,9 @@
                                 <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[Q\bigr]}_{\tiny BH} = \frac{\bigl[Q\bigr]_n}{\sqrt{1%2B {\left ( \frac{\bigl[Q\bigr]_n}{\bigl[Q\bigr]_E} \right )}^2}}="></img>
                             </p:column>
                             <p:column>
-                                <h:outputText id="resShearForcePermissible" value="#{calcWizardBean.calc.resShearForcePermissible}" styleClass="outputLabel"/>
+                                <h:outputText id="resShearForcePermissible" value="#{calcWizardBean.calc.resShearForcePermissible}" styleClass="outputLabel">
+                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                </h:outputText>
                             </p:column>
                         </p:row>
 

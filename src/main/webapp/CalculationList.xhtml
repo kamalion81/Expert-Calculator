@@ -14,7 +14,7 @@
             <p:button outcome="MainMenu" value="Назад в меню" icon="fa fa-fw fa-arrow-left"/>
             <br></br>
             <br></br>
-            <p:dataTable value="#{calcsBean.lazyModel}" var="calc" paginator="true" rows="20" styleClass="paginated" lazy="true">
+            <p:dataTable value="#{calcsBean.calcs}" var="calc" paginator="true" rows="20">
                 <f:facet name="header">
                     Список расчетов
                 </f:facet>
@@ -30,7 +30,7 @@
                 <p:column headerText="Расчет">
                     <h:outputText value="#{calc.name}" style="display:inline-block"/>
                 </p:column>
-            </p:dataTable>>
+            </p:dataTable>
         </h:form>
 
     </h:body>
