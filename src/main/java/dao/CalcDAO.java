@@ -565,7 +565,7 @@ public class CalcDAO implements Serializable {
             }
         } catch (SQLException ex) {
             Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
-            addMessage("Не все значения заполнены, данные не сохранены");
+            addMessage("Не выбран материал. Данные не сохранены");
             return;
         }
         
@@ -579,7 +579,6 @@ public class CalcDAO implements Serializable {
         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, summary,  null);
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
-    
 
     /**
      * @return the intPressure
