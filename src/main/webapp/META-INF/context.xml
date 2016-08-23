@@ -3,7 +3,7 @@
     <Resource name="jdbc/calcdb" auth="Container" type="javax.sql.DataSource"
         maxActive="100" maxIdle="30" maxWait="10000"
         username="kamalion" password="parol" driverClassName="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://DESKTOP-77AKSEI/calculator"/>
+        url="jdbc:mysql://localhost/calculator"/>
     
 </Context>
     

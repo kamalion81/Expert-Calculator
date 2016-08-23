@@ -8,6 +8,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.naming.NamingException;
+import javax.validation.constraints.Min;
 import org.primefaces.event.FlowEvent;
 
 /**
@@ -17,6 +18,7 @@ import org.primefaces.event.FlowEvent;
 @ManagedBean
 @ViewScoped
 public class CalcWizardBean implements Serializable {
+    
 
     private boolean skip;
     
@@ -55,6 +57,7 @@ public class CalcWizardBean implements Serializable {
     public void setMat(MaterialDAO mat) {
         this.mat = mat;
     }
+
 
 }
     

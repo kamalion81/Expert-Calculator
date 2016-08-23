@@ -25,6 +25,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.naming.NamingException;
 import javax.sql.*;
+import javax.validation.constraints.Min;
 import profiles.CalcProfile;
 
 @ManagedBean
@@ -36,6 +37,7 @@ public class CalcDAO implements Serializable {
 
     //Поля входящих данных
     private String material;
+    @Min(0)
     private Float intPressure;
     private Integer temp;
     private Float tempT;
@@ -77,7 +79,8 @@ public class CalcDAO implements Serializable {
     public CalcDAO() {
         this.temp = 20;
         this.koef = (float)2.4;
-        this.length_pr = (float)1;
+        
+        
         
         
          DataBase db = new DataBase();
@@ -225,15 +228,28 @@ public class CalcDAO implements Serializable {
     
     public void writeResults(){
         
+        Float res;
         
         try {
-            setResThickness(intPressure * diam / (2 * tempT * weld - intPressure));
+            res = intPressure * diam / (2 * tempT * weld - intPressure);
+            //setResThickness(intPressure * diam / (2 * tempT * weld - intPressure));
+            if(res.isNaN()||res.isInfinite()||res == 0){
+                setResThickness(null);
+            } else {
+                setResThickness(res);
+            }
         } catch (NullPointerException ex) {
             setResThickness(null);
         }
 
         try {
-            setResIntPressure((2 * weld * tempT * (thickness - addThickness)) / (diam + thickness - addThickness));
+            res = (2 * weld * tempT * (thickness - addThickness)) / (diam + thickness - addThickness);
+            if(res.isNaN()||res.isInfinite()||res == 0){
+                setResIntPressure(null);
+            } else {
+                setResIntPressure(res);
+            }
+            //setResIntPressure((2 * weld * tempT * (thickness - addThickness)) / (diam + thickness - addThickness));
         } catch (NullPointerException ex) {
             setResIntPressure(null);
         }
@@ -245,22 +261,43 @@ public class CalcDAO implements Serializable {
         }
         
         try{
-            setResAxialForceStrength((float)Math.PI*(diam+thickness-addThickness)*(thickness-addThickness)*tempT);
+            res = (float)Math.PI*(diam+thickness-addThickness)*(thickness-addThickness)*tempT;
+           // setResAxialForceStrength((float)Math.PI*(diam+thickness-addThickness)*(thickness-addThickness)*tempT);
+           if(res.isNaN()||res.isInfinite()||res == 0){
+                setResAxialForceStrength(null);
+            } else {
+                setResAxialForceStrength(res);
+            }
         }catch(NullPointerException ex){
            setResAxialForceStrength(null); 
         }
         
         try{
-            float part1 = (float) (0.000310 / koef * Math.pow(diam, 2));
+            float part1 = (float) (0.000360*elasticity/ koef * Math.pow(diam, 2));
             float part2 = (float) (Math.pow((100 * (thickness - addThickness) / diam), (float) 2.5));
-            setResAxialCompessiveForceLocal(part1 * part2);
+            res = part1*part2;
+            
+            if(res.isNaN()||res.isInfinite()||res == 0){
+                setResAxialCompessiveForceLocal(null);
+            } else {
+                setResAxialCompessiveForceLocal(part1 * part2);
+            }
+                
+            
         } catch (NullPointerException ex) {
             setResAxialCompessiveForceLocal(null);
         }
         
         try{
-            float part = (float)((2.83*length_pr)/(diam+thickness-addThickness));
-            setResFlexibility(part);
+            //float part = (float)((2.83*length_pr)/(diam+thickness-addThickness));
+            res = (float)((2.83*length_pr)/(diam+thickness-addThickness));
+            if(res.isNaN()||res.isInfinite()||res == 0){
+                setResFlexibility(null);
+            } else {
+                setResFlexibility(res);
+            }
+            
+            //setResFlexibility(part);
         }catch(NullPointerException ex){
             setResFlexibility(null);
         }
@@ -273,8 +310,14 @@ public class CalcDAO implements Serializable {
             } else if (condition >= 10) {
                 float part1 = (float) ((Math.PI * (diam + thickness - addThickness) * (thickness - addThickness) * elasticity) / koef);
                 float part2 = (float) (Math.pow(Math.PI, resFlexibility));
+                res = part1 * part2;
+                if (res.isNaN() || res.isInfinite()||res == 0) {
+                    setResAxialCompessiveForce(null);
+                } else {
+                    setResAxialCompessiveForce(res);
+                }
 
-                setResAxialCompessiveForce(part1 * part2);
+                //setResAxialCompessiveForce(part1 * part2);
             }
 
         } catch (NullPointerException ex) {
@@ -288,12 +331,19 @@ public class CalcDAO implements Serializable {
         }
             
         try{
-            float part1 = (float) Math.pow((resAxialForceStrength/resAxialForceElasticity),2);
-            float part2 = (float) Math.sqrt(1+part1);
-            
-            setResAxialForcePermissible((float)resAxialForceStrength/part2);
-            
-        }catch(NullPointerException ex){
+            float part1 = (float) Math.pow((resAxialForceStrength / resAxialForceElasticity), 2);
+            float part2 = (float) Math.sqrt(1 + part1);
+
+            res = (float) resAxialForceStrength / part2;
+
+            //setResAxialForcePermissible((float)resAxialForceStrength/part2);
+            if (res.isNaN() || res.isInfinite()||res == 0) {
+                setResAxialForcePermissible(null);
+            } else {
+                setResAxialForcePermissible(res);
+            }
+
+        } catch (NullPointerException ex) {
             setResAxialForcePermissible(null);
         }
         
@@ -306,8 +356,13 @@ public class CalcDAO implements Serializable {
         }
         
         try{
-            float part = (float)((Math.PI/4)*(diam+thickness-addThickness)*(thickness-addThickness)*tempT);
-            setResBendingMomentStrength(part);
+            res = (float)((Math.PI/4)*(diam+thickness-addThickness)*(thickness-addThickness)*tempT);
+            //setResBendingMomentStrength(part);
+             if (res.isNaN() || res.isInfinite()||res == 0) {
+                setResBendingMomentStrength(null);
+            } else {
+                setResBendingMomentStrength(res);
+            }
             
         }catch(NullPointerException ex){
             setResBendingMomentStrength(null);
@@ -318,7 +373,14 @@ public class CalcDAO implements Serializable {
             float part1 = (float)(((0.000089*elasticity)/koef)*Math.pow(diam, 3));
             float part2 = (float)(Math.pow(((100*(thickness-addThickness))/diam),2.5));
             
-            setResBendingMomentElasticity(part1*part2);
+            res = part1*part2;
+            if (res.isNaN() || res.isInfinite()||res == 0) {
+                setResBendingMomentElasticity(null);
+            } else {
+                setResBendingMomentElasticity(res);
+            }
+            
+            //setResBendingMomentElasticity(part1*part2);
             
         }catch(NullPointerException ex){
             setResBendingMomentElasticity(null);
@@ -327,7 +389,13 @@ public class CalcDAO implements Serializable {
         try{
             
             float part = (float) Math.sqrt(1+ Math.pow(resBendingMomentStrength/resBendingMomentElasticity, 2));
-            setResBendingMomentPermissible(resBendingMomentStrength/part);
+            res = resBendingMomentStrength/part;
+            //setResBendingMomentPermissible(resBendingMomentStrength/part);
+             if (res.isNaN() || res.isInfinite()||res == 0) {
+                setResBendingMomentPermissible(null);
+            } else {
+                setResBendingMomentPermissible(res);
+            }
             
         }catch(NullPointerException ex){
           setResBendingMomentPermissible(null);  
@@ -341,8 +409,13 @@ public class CalcDAO implements Serializable {
         
         try{
             
-            float part = (float) (0.25*Math.PI*diam*(thickness-addThickness)*tempT);
-            setResShearForceStrength(part);        
+            res = (float) (0.25*Math.PI*diam*(thickness-addThickness)*tempT);
+            if (res.isNaN() || res.isInfinite()||res == 0) {
+                setResShearForceStrength(null);
+            } else {
+                setResShearForceStrength(res);
+            }
+            //setResShearForceStrength(part);        
             
         }catch(NullPointerException ex){
             setResShearForceStrength(null);        
@@ -351,7 +424,14 @@ public class CalcDAO implements Serializable {
         try{
             float part1 = (float)((2.4*elasticity*(thickness-addThickness)*tempT)/koef);
             float part2 = (float)Math.abs(0.18+3.3*((diam*(thickness-addThickness))/(Math.pow(length, 2))));
-            setResShearForceElasticity(part1*part2);
+            res = part1*part2;
+            if (res.isNaN() || res.isInfinite()||res == 0) {
+                setResShearForceElasticity(null);
+            } else {
+                setResShearForceElasticity(res);
+            }
+            
+            //setResShearForceElasticity(part1*part2);
             
         }catch(NullPointerException ex){
             setResShearForceElasticity(null);
@@ -359,9 +439,13 @@ public class CalcDAO implements Serializable {
         
         try{
             float part = (float) Math.sqrt(1+ Math.pow(resShearForceStrength/resShearForceElasticity, 2));
-            setResBendingMomentPermissible(resShearForceStrength/part);
-            
-            setResShearForcePermissible(part);
+            res = resShearForceStrength/part;
+            if (res.isNaN() || res.isInfinite()||res == 0) {
+                setResShearForcePermissible(null);
+            } else {
+                setResShearForcePermissible(res);
+            }
+            //setResShearForcePermissible(resShearForceStrength/part);
             
         }catch(NullPointerException ex){
             setResShearForcePermissible(null);

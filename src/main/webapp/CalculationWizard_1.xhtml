@@ -6,15 +6,17 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core" 
       xmlns:c="http://java.sun.com/jsp/jstl/core"
       xmlns:p="http://primefaces.org/ui">
-    
+
     <h:head>
-       
+
         <title>Расчет</title>
+        <h:outputStylesheet library="css" name="style.css"/>
     </h:head>
     <h:body>
-         <h:outputStylesheet library="css" name="style.css"/>
-        
+
+
         <h:form id="form">
+            <p:messages/>
             <p:growl id="growl" sticky="true" showDetail="false"/>
             <p:toolbar>
                 <f:facet name="left">
@@ -24,10 +26,10 @@
             </p:toolbar>
             <br></br>
             <br></br>
-            <p:layout  style="min-width:1300px; max-width: 1300px; min-height: 1527px; max-height: 1527px" >
-                <p:layoutUnit   header="Входящие данные" position="west" resizable="false" size="600" minSize="600" maxSize="600">
+            <p:layout  style="min-width:1300px; max-width: 1300px; min-height: 1100px; max-height: 1100px" >
+                <p:layoutUnit   header="Входящие данные" position="west" resizable="true" size="600" minSize="600" maxSize="600">
                     <p:panelGrid  id="input" style="margin-top: 20px;
-                                    font-style: italic; font-size: small">
+                                  font-style: italic; font-size: small">
 
                         <f:facet name="header">
                             <p:row>
@@ -42,13 +44,14 @@
                             <p:column>Марка стали</p:column>
                             <p:column style="background: blanchedalmond">
                                 <p:selectOneMenu  styleClass="ui-selectonemenuitems" value="#{calcWizardBean.calc.material}" effect="fold">
-                                    <p:ajax event="itemSelect" listener="#{calcWizardBean.calc.changeTemp}" update="input results" />
+                                    <p:ajax event="itemSelect" listener="#{calcWizardBean.calc.changeTemp}" update="input results1 results2 results3" />
                                     <f:selectItem  itemLabel="Выберите материал" itemValue="" />
                                     <f:selectItems  value="#{calcWizardBean.mat.names}" var="material"/>
                                 </p:selectOneMenu>
                             </p:column>
                         </p:row>
-                        
+
+
                         <!--tempT elasticity resThickness resIntPressure-->
 
                         <p:row>
@@ -56,28 +59,33 @@
 
                             <p:column>P</p:column>
                             <p:column style="background: blanchedalmond">
-                                <p:inputText id="intPressure" type="float" value="#{calcWizardBean.calc.intPressure}" label="Расчетное внутреннее давление">
-                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results" />
+                                <p:inputText id="intPressure" type="float"  validatorMessage="Число не может быть отрицательным" converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.intPressure}" label="Расчетное внутреннее давление">
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results1 results2 results3" />
                                 </p:inputText>
                                 <p:message for="intPressure"/>
                             </p:column>
                         </p:row>
-                        
+
                         <!--resThickness resIntPressure resGreaterPressure resGreaterThickness-->
 
                         <p:row>
                             <p:column>Расчетная температура, <sup>o</sup>C</p:column>
                             <p:column>T</p:column>
                             <p:column style="background: blanchedalmond">
-                                <p:inputText id="temp" value="#{calcWizardBean.calc.temp}" label="Расчетная температура" >
-                                    <p:ajax event="change" listener="#{calcWizardBean.calc.changeTemp}" update="input results"/>
+                                <p:inputText id="temp" validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.temp}" label="Расчетная температура" >
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.changeTemp}" update="input results1 results2 results3"/>
                                 </p:inputText>
                                 <!--<p:watermark for="temp" value="20" />-->
                                 <!--lineExpCoeff,tempT,temp20,yieldStrengthT,yieldStrength20,tempResist-->
-                                <!--<p:message for="temp"/>-->
+                                <p:message for="temp"/>
                             </p:column>
                         </p:row>
-                        
+
                         <!--tempT resThickness resIntPressure resGreaterThickness elasticity-->
 
                         <p:row>
@@ -86,7 +94,12 @@
                             </p:column>
                             <p:column>[&sigma;]<sup>T</sup></p:column>
                             <p:column style="background: cadetblue">
-                                <p:inputText id="tempT"  type="float" value="#{calcWizardBean.calc.tempT}" label="Допускаемое напряжение при расчетной температуре Т"/>
+                                <p:inputText id="tempT"  type="float" validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.tempT}" label="Допускаемое напряжение при расчетной температуре Т">
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results1 results2 results3"/>
+                                </p:inputText>
                                 <p:message for="tempT"/>
                             </p:column>
                         </p:row>
@@ -98,13 +111,16 @@
                             </p:column>
                             <p:column>D</p:column>
                             <p:column style="background: blanchedalmond">
-                                <p:inputText id="diam" value="#{calcWizardBean.calc.diam}" label="Внутренний диаметр цилиндрической обечайки">
-                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results" />
+                                <p:inputText id="diam" validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.diam}" label="Внутренний диаметр цилиндрической обечайки">
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results1 results2 results3" />
                                 </p:inputText>
                                 <p:message for="diam"/>
                             </p:column>
                         </p:row>
-                        
+
                         <!--resThickness resIntPressure resGreaterPressure resGreaterThickness-->
 
                         <p:row>
@@ -114,52 +130,64 @@
                             </p:column>
                             <p:column>S</p:column>
                             <p:column style="background: blanchedalmond">
-                                <p:inputText  id="thickness" value="#{calcWizardBean.calc.thickness}" label="Номинальная исполнительная толщина">
-                                    <p:ajax event="change" listener="#{calcWizardBean.calc.changeThickness}" update="tempT results" />
+                                <p:inputText  id="thickness" validatorMessage="Число не может быть отрицательным" 
+                                              converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.thickness}" label="Номинальная исполнительная толщина">
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.changeThickness}" update="tempT results1 results2 results3" />
                                 </p:inputText>
                                 <p:message for="thickness"/>
                             </p:column>
                         </p:row>
-                        
+
                         <!--tempT resThickness resIntPressure-->
 
                         <p:row>
                             <p:column>Прибавка на коррозию и эрозию, мм</p:column>
                             <p:column>c<sub>1</sub></p:column>
                             <p:column style="background: blanchedalmond">
-                                <p:inputText id="corrosion" type="float" value="#{calcWizardBean.calc.corrosion}" label="Прибавка на коррозию и эрозию">
-                                    <p:ajax event="change" listener="#{calcWizardBean.calc.changeC}" update="results addThickness"/> 
+                                <p:inputText id="corrosion" type="float" validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.corrosion}" label="Прибавка на коррозию и эрозию">
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.changeC}" update="results1 results2 results3 addThickness"/> 
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
                                 </p:inputText>
                                 <p:message for="corrosion"/>
                             </p:column>
                         </p:row>
-                        
+
                         <!--resIntPressure addThickness-->
 
                         <p:row>
                             <p:column>Прибавка на минусовый допуск, мм</p:column>
                             <p:column>c<sub>2</sub></p:column>
                             <p:column style="background: blanchedalmond">
-                                <p:inputText id="minusTolerance" type="float" value="#{calcWizardBean.calc.minusTolerance}" label="Прибавка на минусовый допуск">
-                                    <p:ajax event="change" listener="#{calcWizardBean.calc.changeC}" update="results addThickness" />
+                                <p:inputText id="minusTolerance" type="float" validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.minusTolerance}" label="Прибавка на минусовый допуск">
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.changeC}" update="results1 results2 results3 addThickness" />
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
                                 </p:inputText>
                                 <p:message for="minusTolerance"/>
                             </p:column>
                         </p:row>
-                        
+
                         <!--resIntPressure addThickness-->
 
                         <p:row>
                             <p:column>Прибавка технологическая, мм</p:column>
                             <p:column>c<sub>3</sub></p:column>
                             <p:column style="background: blanchedalmond">
-                                <p:inputText id="techno" type="float" value="#{calcWizardBean.calc.techno}" label="Прибавка технологическая">
-                                    <p:ajax event="change" listener="#{calcWizardBean.calc.changeC}" update="results addThickness" />
+                                <p:inputText id="techno" type="float" validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.techno}" label="Прибавка технологическая">
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.changeC}" update="results1 results2 results3 addThickness" />
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
                                 </p:inputText>
                                 <p:message for="techno"/>
                             </p:column>
                         </p:row>
-                        
+
                         <!--resIntPressure addThickness-->
 
                         <p:row>
@@ -167,7 +195,12 @@
                                 <br></br>цилиндрической обечайки, мм</p:column>
                             <p:column>C = c<sub>1</sub>+c<sub>2</sub>+c<sub>3</sub></p:column>
                             <p:column style="background: cadetblue">
-                                <p:inputText id="addThickness" type="float" value="#{calcWizardBean.calc.addThickness}" label="Суммарная прибавка"/>
+                                <p:inputText id="addThickness" validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" type="float" value="#{calcWizardBean.calc.addThickness}" label="Суммарная прибавка">
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results1 results2 results3"/>
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
+                                </p:inputText>
                                 <p:message for="addThickness"/>
                             </p:column>
                         </p:row>
@@ -178,7 +211,12 @@
                                 <br></br>стали) при Т <sup>o</sup>С, МПа</p:column>
                             <p:column>E</p:column>
                             <p:column style="background: cadetblue">
-                                <p:inputText id="elasticity" type="float" value="#{calcWizardBean.calc.elasticity}" label="Модуль упругости"/>
+                                <p:inputText id="elasticity" type="float" validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.elasticity}" label="Модуль упругости">
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results1 results2 results3"/>
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
+                                </p:inputText>
                                 <p:message for="elasticity"/>
                             </p:column>
                         </p:row>
@@ -187,15 +225,18 @@
                             <p:column>Коэффициент прочности сварного шва</p:column>
                             <p:column>&phi;</p:column>
                             <p:column style="background: blanchedalmond">
-                                <p:inputText id="weld" type="float" value="#{calcWizardBean.calc.weld}" label="Коэффициент прочности">
-                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results" />
+                                <p:inputText id="weld" type="float" validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.weld}" label="Коэффициент прочности">
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results1 results2 results3" />
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
                                 </p:inputText>
                                 <p:message for="weld"/>
                             </p:column>
                         </p:row>
-                        
+
                         <!--resThickness resIntPressure resGreaterPressure resGreaterThickness-->
-                        
+
                         <p:row>
                             <p:column>Коэффициент запаса устойчивости
                                 <br>(расчетные условия)</br>
@@ -204,45 +245,54 @@
                                 <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {n_y}"></img>
                             </p:column>
                             <p:column style="background: blanchedalmond">
-                                <p:inputText id="koef" type="float" value="#{calcWizardBean.calc.koef}" label="Коэффициент запаса устойчивости">
-                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results" />
+                                <p:inputText id="koef" type="float" validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.koef}" label="Коэффициент запаса устойчивости">
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results1 results2 results3" />
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
                                 </p:inputText>
                                 <p:message for="koef"/>
                             </p:column>
                         </p:row>
-                        
-                         <p:row>
+
+                        <p:row>
                             <p:column>Расчетная длина цилиндрической
                                 <br>обечайки</br>
                             </p:column>
                             <p:column>l</p:column>
                             <p:column style="background: blanchedalmond">
-                                <p:inputText id="length" type="float" value="#{calcWizardBean.calc.length}" label="Расчетная длина">
-                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results" />
+                                <p:inputText id="length" type="float" validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.length}" label="Расчетная длина">
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results1 results2 results3" />
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
                                 </p:inputText>
                                 <p:message for="length"/>
                             </p:column>
                         </p:row>
-                        
+
                         <p:row>
                             <p:column>Приведенная длина цилиндрической
                                 <br>обечайки</br>
                             </p:column>
                             <p:column>l<small>пр</small></p:column>
                             <p:column style="background: blanchedalmond">
-                                <p:inputText id="length_pr" type="float" value="#{calcWizardBean.calc.length_pr}" label="Расчетная длина">
-                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results" />
+                                <p:inputText id="length_pr" type="float"  validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.length_pr}" label="Расчетная длина">
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results1 results2 results3" />
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
                                 </p:inputText>
                                 <p:message for="length_pr"/>
                             </p:column>
                         </p:row>
-                        
+
                     </p:panelGrid>
-                    
-                    
+
+
 
                     <p:panelGrid style="margin-top:20px;
-                                     font-style: italic; font-size: small" >
+                                 font-style: italic; font-size: small" >
                         <f:facet name="header">
                             <p:row>
                                 <p:column colspan="3">Цилиндрическая обечайка</p:column>
@@ -253,8 +303,11 @@
                             <p:column>Изгибный момент, Н&middot;мм</p:column>
                             <p:column>M</p:column>
                             <p:column style="background: blanchedalmond">
-                                <p:inputText id="bending" value="#{calcWizardBean.calc.bending}" label="Изгибный момент">
-                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results" />
+                                <p:inputText id="bending" validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.bending}" label="Изгибный момент">
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results1 results2 results3" />
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
                                 </p:inputText>
                                 <p:message for="bending"/>
                             </p:column>
@@ -264,8 +317,11 @@
                             <p:column>Поперечное сдвиговое усилие, Н</p:column>
                             <p:column>Q</p:column>
                             <p:column style="background: blanchedalmond">
-                                <p:inputText id="shift" value="#{calcWizardBean.calc.shift}" label="Поперечное сдвиговое усилие">
-                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results" />
+                                <p:inputText id="shift" validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.shift}" label="Поперечное сдвиговое усилие">
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results1 results2 results3" />
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
                                 </p:inputText>
                                 <p:message for="shift"/>
                             </p:column>
@@ -275,8 +331,11 @@
                             <p:column>Осевая сила, Н</p:column>
                             <p:column>F</p:column>
                             <p:column style="background: blanchedalmond">
-                                <p:inputText id="force" value="#{calcWizardBean.calc.force}" label="Осевая сила">
-                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results" />
+                                <p:inputText id="force" validatorMessage="Число не может быть отрицательным" 
+                                             converterMessage="Введенное значение некорректно. Пример корректного ввода: 15.54" value="#{calcWizardBean.calc.force}" label="Осевая сила">
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results1 results2 results3" />
+                                    <f:validateDoubleRange minimum="0" />
+                                    <p:clientValidator event="change"/>
                                 </p:inputText>
                                 <p:message for="force"/>
                             </p:column>
@@ -286,49 +345,287 @@
                 </p:layoutUnit>
 
                 <p:layoutUnit header="Результаты расчетов" position="center" resizable="false" size="600" minSize="600" maxSize="600">
+                    <p:fieldset style="margin-bottom:10px; margin-top: 10px" collapsed="true" legend="Параметры расчета на прочность на внутреннее давление" toggleable="true" toggleSpeed="500">
 
-                    <p:panelGrid id="results" style="margin-top:20px;
+                        <p:panelGrid id="results1" style="margin-top:20px;
+                                     font-style: italic; font-size: small">
+                            
+                            <f:facet name="header">
+                                <p:row>
+                                    <p:column colspan="3">Расчет на прочность на внутреннее давление</p:column>
+                                </p:row>
+                            </f:facet>
+                            
+                            <f:facet name="header">
+                                <p:row>
+                                    <p:column colspan="1">Параметр</p:column>
+                                    <p:column colspan="1">Формула расчета</p:column>
+                                    <p:column colspan="1">Результат</p:column>
+                                </p:row>
+                            </f:facet>
+
+                            <p:row>
+                                <p:column>Расчетная толщина, мм</p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {S}_{\tiny p} = \frac{PD}{2\,{\bigl[\normal o\bigr]}^{\tiny T}{\phi}_{\tiny p}-P}"></img>
+                                </p:column>
+                                <p:column> 
+                                    <h:outputText id="resThickness" value="#{calcDAO.resThickness}">
+                                        <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. внутреннее
+                                    <br></br>давление из условий
+                                    <br></br>прочности обечайки, МПа
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[P\bigr]} = \frac{2\normal \phi{\bigl[\sigma\bigr]}^{\tiny T}\left(S-C\right)}{D%2BS-C}"></img>
+                                </p:column>
+                                <p:column> 
+                                    <h:outputText id="resIntPressure" value="#{calcDAO.resIntPressure}" styleClass="outputLabel">
+                                        <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset collapsed="true" legend="Параметры расчета допускаемых внешних нагрузок" toggleable="true" toggleSpeed="500">
+                        <p:panelGrid  id="results2" style="margin-top:20px;
+                                     font-style: italic; font-size: small">
+
+                            <!--<p:row>
+                                <p:column colspan="3" styleClass="ui-widget-header" style="text-align: center">
+                                    Расчет допускаемых внешних нагрузок
+                                </p:column>
+                            </p:row>-->
+                            
+                            <f:facet name="header">
+                                <p:row>
+                                    <p:column colspan="3" style="text-align: center">Расчет на прочность на внутреннее давление </p:column>
+                                </p:row>
+                            </f:facet>
+                            
+                            <f:facet name="header">
+                                <p:row>
+                                    <p:column colspan="1">Параметр</p:column>
+                                    <p:column colspan="1">Формула расчета</p:column>
+                                    <p:column colspan="1">Результат</p:column>
+                                </p:row>
+                            </f:facet>
+
+                            <p:row>
+                                <p:column>Доп. осевое усилие 
+                                    <br></br>обечайки из условия 
+                                    <br></br>прочности, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{\tiny n} = \pi\left(D%2BS-C\right)\cdot \left(S-C\right){\bigl[\sigma\bigr]}^{\tiny T} "></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText id="resAxialForceStrength" value="#{calcWizardBean.calc.resAxialForceStrength}" styleClass="outputLabel">
+                                        <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. осевое сжимающее 
+                                    <br></br>усилие обечайки из  
+                                    <br></br>условия местной 
+                                    <br></br>устойчивости в пределах 
+                                    <br></br>упругости, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{E_1} = \frac{360\cdot 10^{-6}E}{n_y}}D^2 \cdot {\left [ \frac{100 \, \bigl(S-C\bigr)}{D} \right ] \quad}^{2,5}"></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText id="resAxialCompessiveForceLocal" value="#{calcWizardBean.calc.resAxialCompessiveForceLocal}" styleClass="outputLabel">
+                                        <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Гибкость</p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= \lambda = \frac{2,83 \ell_{np}}{D%2BS-C}"></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText id="resFlexibility" value="#{calcWizardBean.calc.resFlexibility}" styleClass="outputLabel">
+                                        <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. осевое сжимающее 
+                                    <br></br>усилие обечайки из  
+                                    <br></br>условия общей 
+                                    <br></br>устойчивости в пределах
+                                    <br></br>упругости, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{E_2} = {\bigl[F\bigr]}_{E_1} = "></img>&nbsp;&nbsp;&nbsp;&nbsp;при        
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= \frac{\ell}{D} = %3C 10"></img>
+                                    <br></br><img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{E_2} = \frac{\pi(D%2BS-C)\cdot (S-C)\,E}{n_y} \cdot {\left [ \frac{\pi}{\lambda} \right ] \quad}^{2}="></img>
+                                    <br></br>при&nbsp;<img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= \frac{\ell}{D} = \geq 10"></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText id="resAxialCompessiveForce" value="#{calcWizardBean.calc.resAxialCompessiveForce}" styleClass="outputLabel">
+                                        <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. осевое усилие 
+                                    <br></br>обечайки из условия 
+                                    <br></br>устойчивости в пределах
+                                    <br></br>упругости, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{\tiny E} = \min \Bigl\{{\bigl[F\bigr]}_{E_1},{\bigl[F\bigr]}_{E_2}\Bigr\}= "></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText id="resAxialForceElasticity" value="#{calcWizardBean.calc.resAxialForceElasticity}" styleClass="outputLabel">
+                                        <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Допускаемое осевое 
+                                    <br></br>усилие, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{\tiny BH} = \frac{\bigl[F\bigr]_n}{\sqrt{1%2B {\left ( \frac{\bigl[F\bigr]_n}{\bigl[F\bigr]_E} \right )}^2}}="></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText id="resAxialForcePermissible" value="#{calcWizardBean.calc.resAxialForcePermissible}" styleClass="outputLabel">
+                                        <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. изгибающий момент   
+                                    <br></br>из условий прочности   
+                                    <br></br>обечайки, Н&middot;мм
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[M\bigr]}_n=\frac{\pi}{4}\left(D%2BS-C\right)\cdot \left(S-C\right){\bigl[\sigma\bigr]}^{\tiny T}="></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText id="resBendingMomentStrength" value="#{calcWizardBean.calc.resBendingMomentStrength}" styleClass="outputLabel">
+                                        <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. изгибающий момент   
+                                    <br></br>из условий устойчивости  
+                                    <br></br>обечайки в пределах 
+                                    <br></br>упругости, Н&middot;мм
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[M\bigr]}_E=\frac{89\cdot10^{-6}E}{n_y}D^3\cdot {\left [ \frac{100 \, \bigl(S-C\bigr)}{D} \right ] \quad}^{2,5}="></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText id="resBendingMomentElasticity" value="#{calcWizardBean.calc.resBendingMomentElasticity}" styleClass="outputLabel">
+                                        <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Допускаемый изгибающий  
+                                    <br></br>момент, Н&middot;мм
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[M\bigr]}_{\tiny BH} = \frac{\bigl[M\bigr]_n}{\sqrt{1%2B {\left ( \frac{\bigl[M\bigr]_n}{\bigl[M\bigr]_E} \right )}^2}}="></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText id="resBendingMomentPermissible" value="#{calcWizardBean.calc.resBendingMomentPermissible}" styleClass="outputLabel">
+                                        <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+
+
+
+                            <p:row>
+                                <p:column>Доп. перерезывающая сила  
+                                    <br></br>из условий прочности  
+                                    <br></br>обечайки, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[Q\bigr]}_{\tiny n} = 0,25 \cdot \pi \cdot D \cdot (S-C){\bigl[\sigma\bigr]}^{\tiny T}= "></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText id="resShearForceStrength" value="#{calcWizardBean.calc.resShearForceStrength}" styleClass="outputLabel">
+                                        <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Доп. перерезывающая сила    
+                                    <br></br>из условий устойчивости   
+                                    <br></br>обечайки в пределах  
+                                    <br></br>упругости, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[Q\bigr]}_E=\frac{2,4 \cdot E \cdot {(S-C)}^2}{n_y}\cdot {\left [ 0,18 %2B 3,3 \frac{D(S-C)}{\ell^2} \right ] \quad}="></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText id="resShearForceElasticity" value="#{calcWizardBean.calc.resShearForceElasticity}" styleClass="outputLabel">
+                                        <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>Допускаемая
+                                    <br></br>перерезывающая сила, Н
+                                </p:column>
+                                <p:column>
+                                    <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[Q\bigr]}_{\tiny BH} = \frac{\bigl[Q\bigr]_n}{\sqrt{1%2B {\left ( \frac{\bigl[Q\bigr]_n}{\bigl[Q\bigr]_E} \right )}^2}}="></img>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText id="resShearForcePermissible" value="#{calcWizardBean.calc.resShearForcePermissible}" styleClass="outputLabel">
+                                        <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+
+
+
+                        </p:panelGrid>
+                    </p:fieldset>
+                    
+
+
+                    <p:panelGrid  id="results3" style="margin-top:20px;
                                  font-style: italic; font-size: small">
+                        
                         <f:facet name="header">
                             <p:row>
-                                <p:column colspan="1">Параметр</p:column>
-                                <p:column colspan="1">Формула расчета</p:column>
+                                <p:column colspan="3">Условия прочности</p:column>
+                            </p:row>
+                        </f:facet>
+                        
+                        <f:facet name="header">
+                            <p:row>
+                                <p:column colspan="1">Условие</p:column>
+                                <p:column colspan="1">Формула условия</p:column>
                                 <p:column colspan="1">Результат</p:column>
                             </p:row>
                         </f:facet>
-
-                        <f:facet name="header">
-                            <p:row>
-                                <p:column colspan="3">Расчет на прочность на внутреннее давление</p:column>
-                            </p:row>
-                        </f:facet>
-
-                        <p:row>
-                            <p:column>Расчетная толщина, мм</p:column>
-                            <p:column>
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {S}_{\tiny p} = \frac{PD}{2\,{\bigl[\normal o\bigr]}^{\tiny T}{\phi}_{\tiny p}-P}"></img>
-                            </p:column>
-                            <p:column> 
-                                <h:outputText id="resThickness" value="#{calcDAO.resThickness}">
-                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
-                                </h:outputText>
-                            </p:column>
-                        </p:row>
-
-                        <p:row>
-                            <p:column>Доп. внутреннее
-                                <br></br>давление из условий
-                                <br></br>прочности обечайки, МПа
-                            </p:column>
-                            <p:column>
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[P\bigr]} = \frac{2\normal \phi{\bigl[\sigma\bigr]}^{\tiny T}\left(S-C\right)}{D%2BS-C}"></img>
-                            </p:column>
-                            <p:column> 
-                                <h:outputText id="resIntPressure" value="#{calcDAO.resIntPressure}" styleClass="outputLabel">
-                                   <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
-                                </h:outputText>
-                            </p:column>
-                        </p:row>
 
                         <p:row>
                             <p:column>Условие прочности</p:column>
@@ -351,107 +648,7 @@
                                 <h:outputText id="resGreaterThickness" value="#{calcDAO.resGreaterThickness}" styleClass="outputLabel"/>
                             </p:column>
                         </p:row>
-
-                        <p:row>
-                            <p:column colspan="3" styleClass="ui-widget-header" style="text-align: center">
-                                Расчет допускаемых внешних нагрузок
-                            </p:column>
-                        </p:row>
-
-                        <p:row>
-                            <p:column>Доп. осевое усилие 
-                                <br></br>обечайки из условия 
-                                <br></br>прочности, Н
-                            </p:column>
-                            <p:column>
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{\tiny n} = \pi\left(D%2BS-C\right)\cdot \left(S-C\right){\bigl[\sigma\bigr]}^{\tiny T} "></img>
-                            </p:column>
-                            <p:column>
-                                <h:outputText id="resAxialForceStrength" value="#{calcWizardBean.calc.resAxialForceStrength}" styleClass="outputLabel">
-                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
-                                </h:outputText>
-                            </p:column>
-                        </p:row>
-
-                        <p:row>
-                            <p:column>Доп. осевое сжимающее 
-                                <br></br>усилие обечайки из  
-                                <br></br>условия местной 
-                                <br></br>устойчивости в пределах 
-                                <br></br>упругости, Н
-                            </p:column>
-                            <p:column>
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{E_1} = \frac{310 \cdot 10^{-6}}{n_y}}D^2 \cdot {\left [ \frac{100 \, \bigl(S-C\bigr)}{D} \right ] \quad}^{2,5}"></img>
-                            </p:column>
-                            <p:column>
-                                <h:outputText id="resAxialCompessiveForceLocal" value="#{calcWizardBean.calc.resAxialCompessiveForceLocal}" styleClass="outputLabel">
-                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
-                                </h:outputText>
-                            </p:column>
-                        </p:row>
-
-                        <p:row>
-                            <p:column>Гибкость</p:column>
-                            <p:column>
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= \lambda = \frac{2,83 \ell_{np}}{D%2BS-C}"></img>
-                            </p:column>
-                            <p:column>
-                                <h:outputText id="resFlexibility" value="#{calcWizardBean.calc.resFlexibility}" styleClass="outputLabel">
-                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
-                                </h:outputText>
-                            </p:column>
-                        </p:row>
-
-                        <p:row>
-                            <p:column>Доп. осевое сжимающее 
-                                <br></br>усилие обечайки из  
-                                <br></br>условия общей 
-                                <br></br>устойчивости в пределах
-                                <br></br>упругости, Н
-                            </p:column>
-                            <p:column>
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{E_2} = {\bigl[F\bigr]}_{E_1} = "></img>&nbsp;&nbsp;&nbsp;&nbsp;при        
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= \frac{\ell}{D} = %3C 10"></img>
-                                <br></br><img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{E_2} = \frac{\pi(D%2BS-C)\cdot (S-C)\,E}{n_y} \cdot {\left [ \frac{\pi}{\lambda} \right ] \quad}^{2}="></img>
-                                <br></br>при&nbsp;<img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= \frac{\ell}{D} = \geq 10"></img>
-                            </p:column>
-                            <p:column>
-                                <h:outputText id="resAxialCompessiveForce" value="#{calcWizardBean.calc.resAxialCompessiveForce}" styleClass="outputLabel">
-                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
-                                </h:outputText>
-                            </p:column>
-                        </p:row>
-
-                        <p:row>
-                            <p:column>Доп. осевое усилие 
-                                <br></br>обечайки из условия 
-                                <br></br>устойчивости в пределах
-                                <br></br>упругости, Н
-                            </p:column>
-                            <p:column>
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{\tiny E} = \min \Bigl\{{\bigl[F\bigr]}_{E_1},{\bigl[F\bigr]}_{E_2}\Bigr\}= "></img>
-                            </p:column>
-                            <p:column>
-                                <h:outputText id="resAxialForceElasticity" value="#{calcWizardBean.calc.resAxialForceElasticity}" styleClass="outputLabel">
-                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
-                                </h:outputText>
-                            </p:column>
-                        </p:row>
-
-                        <p:row>
-                            <p:column>Допускаемое осевое 
-                                <br></br>усилие, Н
-                            </p:column>
-                            <p:column>
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[F\bigr]}_{\tiny BH} = \frac{\bigl[F\bigr]_n}{\sqrt{1%2B {\left ( \frac{\bigl[F\bigr]_n}{\bigl[F\bigr]_E} \right )}^2}}="></img>
-                            </p:column>
-                            <p:column>
-                                <h:outputText id="resAxialForcePermissible" value="#{calcWizardBean.calc.resAxialForcePermissible}" styleClass="outputLabel">
-                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
-                                </h:outputText>
-                            </p:column>
-                        </p:row>
-
+                        
                         <p:row>
                             <p:column>Условия прочности  
                                 <br></br>цилиндрической обечайки  
@@ -465,51 +662,6 @@
                             </p:column>
                             <p:column>
                                 <h:outputText id="resStrengthConditionsThrust" value="#{calcWizardBean.calc.resStrengthConditionsThrust}" styleClass="outputLabel"/>
-                            </p:column>
-                        </p:row>
-
-                        <p:row>
-                            <p:column>Доп. изгибающий момент   
-                                <br></br>из условий прочности   
-                                <br></br>обечайки, Н&middot;мм
-                            </p:column>
-                            <p:column>
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[M\bigr]}_n=\frac{\pi}{4}\left(D%2BS-C\right)\cdot \left(S-C\right){\bigl[\sigma\bigr]}^{\tiny T}="></img>
-                            </p:column>
-                            <p:column>
-                                <h:outputText id="resBendingMomentStrength" value="#{calcWizardBean.calc.resBendingMomentStrength}" styleClass="outputLabel">
-                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
-                                </h:outputText>
-                            </p:column>
-                        </p:row>
-
-                        <p:row>
-                            <p:column>Доп. изгибающий момент   
-                                <br></br>из условий устойчивости  
-                                <br></br>обечайки в пределах 
-                                <br></br>упругости, Н&middot;мм
-                            </p:column>
-                            <p:column>
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[M\bigr]}_E=\frac{89\cdot10^{-6}E}{n_y}D^3\cdot {\left [ \frac{100 \, \bigl(S-C\bigr)}{D} \right ] \quad}^{2,5}="></img>
-                            </p:column>
-                            <p:column>
-                                <h:outputText id="resBendingMomentElasticity" value="#{calcWizardBean.calc.resBendingMomentElasticity}" styleClass="outputLabel">
-                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
-                                </h:outputText>
-                            </p:column>
-                        </p:row>
-
-                        <p:row>
-                            <p:column>Допускаемый изгибающий  
-                                <br></br>момент, Н&middot;мм
-                            </p:column>
-                            <p:column>
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[M\bigr]}_{\tiny BH} = \frac{\bigl[M\bigr]_n}{\sqrt{1%2B {\left ( \frac{\bigl[M\bigr]_n}{\bigl[M\bigr]_E} \right )}^2}}="></img>
-                            </p:column>
-                            <p:column>
-                                <h:outputText id="resBendingMomentPermissible" value="#{calcWizardBean.calc.resBendingMomentPermissible}" styleClass="outputLabel">
-                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
-                                </h:outputText>
                             </p:column>
                         </p:row>
 
@@ -530,51 +682,6 @@
                         </p:row>
 
                         <p:row>
-                            <p:column>Доп. перерезывающая сила  
-                                <br></br>из условий прочности  
-                                <br></br>обечайки, Н
-                            </p:column>
-                            <p:column>
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[Q\bigr]}_{\tiny n} = 0,25 \cdot \pi \cdot D \cdot (S-C){\bigl[\sigma\bigr]}^{\tiny T}= "></img>
-                            </p:column>
-                            <p:column>
-                                <h:outputText id="resShearForceStrength" value="#{calcWizardBean.calc.resShearForceStrength}" styleClass="outputLabel">
-                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
-                                </h:outputText>
-                            </p:column>
-                        </p:row>
-
-                        <p:row>
-                            <p:column>Доп. перерезывающая сила    
-                                <br></br>из условий устойчивости   
-                                <br></br>обечайки в пределах  
-                                <br></br>упругости, Н
-                            </p:column>
-                            <p:column>
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[Q\bigr]}_E=\frac{2,4 \cdot E \cdot {(S-C)}^2}{n_y}\cdot {\left [ 0,18 %2B 3,3 \frac{D(S-C)}{\ell^2} \right ] \quad}="></img>
-                            </p:column>
-                            <p:column>
-                                <h:outputText id="resShearForceElasticity" value="#{calcWizardBean.calc.resShearForceElasticity}" styleClass="outputLabel">
-                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
-                                </h:outputText>
-                            </p:column>
-                        </p:row>
-
-                        <p:row>
-                            <p:column>Допускаемая
-                                <br></br>перерезывающая сила, Н
-                            </p:column>
-                            <p:column>
-                                <img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= {\bigl[Q\bigr]}_{\tiny BH} = \frac{\bigl[Q\bigr]_n}{\sqrt{1%2B {\left ( \frac{\bigl[Q\bigr]_n}{\bigl[Q\bigr]_E} \right )}^2}}="></img>
-                            </p:column>
-                            <p:column>
-                                <h:outputText id="resShearForcePermissible" value="#{calcWizardBean.calc.resShearForcePermissible}" styleClass="outputLabel">
-                                    <f:convertNumber groupingUsed="true" maxFractionDigits="2"/>
-                                </h:outputText>
-                            </p:column>
-                        </p:row>
-
-                        <p:row>
                             <p:column>Условия прочности  
                                 <br></br>цилиндрической обечайки  
                                 <br></br>на действие 
@@ -591,6 +698,7 @@
                         </p:row>
 
                     </p:panelGrid>
+                    
                 </p:layoutUnit>
             </p:layout>
         </h:form>
