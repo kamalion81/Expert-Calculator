@@ -26,7 +26,21 @@ import javax.faces.event.ActionEvent;
 import javax.naming.NamingException;
 import javax.sql.*;
 import javax.validation.constraints.Min;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+import org.docx4j.Docx4J;
+import java.util.HashMap;
+import javax.xml.bind.JAXBException;
+
+import org.docx4j.XmlUtils;
+import org.docx4j.jaxb.Context;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
+import org.docx4j.openpackaging.io.SaveToZipFile;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
+import org.docx4j.wml.Document;
 import profiles.CalcProfile;
+import java.util.Date;
 
 @ManagedBean
 @ApplicationScoped
@@ -34,10 +48,11 @@ public class CalcDAO implements Serializable {
     
     private DataSource ds;
     
-
+    private Integer id;
+    private Date date;
     //Поля входящих данных
     private String material;
-    @Min(0)
+    private Integer id_open;
     private Float intPressure;
     private Integer temp;
     private Float tempT;
@@ -77,15 +92,16 @@ public class CalcDAO implements Serializable {
     private String resStrengthConditionsShearForce;
 
     public CalcDAO() {
+        
+        
+        
         this.temp = 20;
         this.koef = (float)2.4;
-        
-        
-        
         
          DataBase db = new DataBase();
          ds = db.getDs();
         
+         
     }
     
     public List<CalcProfile> getCalcs(){
@@ -149,6 +165,200 @@ public class CalcDAO implements Serializable {
         
         
     }
+    
+    public void fillCalc(){
+        
+        try {
+            try (Connection conn = ds.getConnection()) {
+                String query = "SELECT calcs.id,"
+                        + "    `calcs`.`name`,"
+                        + "    `calcs`.`date`,"
+                        + "    `materials`.`matname`,"
+                        + "    `calcs`.`intPressure`,"
+                        + "    `calcs`.`temp`,"
+                        + "    `calcs`.`tempT`,"
+                        + "    `calcs`.`diam`,"
+                        + "    `calcs`.`thickness`,"
+                        + "    `calcs`.`corrosion`,"
+                        + "    `calcs`.`minusTolerance`,"
+                        + "    `calcs`.`techno`,"
+                        + "    `calcs`.`addThickness`,"
+                        + "    `calcs`.`elasticity`,"
+                        + "    `calcs`.`weld`,"
+                        + "    `calcs`.`koef`,"
+                        + "    `calcs`.`length`,"
+                        + "    `calcs`.`length_pr`,"
+                        + "    `calcs`.`bending`,"
+                        + "    `calcs`.`shift`,"
+                        + "    `calcs`.`force`,"
+                        + "    `calcs`.`resThickness`,"
+                        + "    `calcs`.`resIntPressure`,"
+                        + "    `calcs`.`resGreaterPressure`,"
+                        + "    `calcs`.`resGreaterThickness`,"
+                        + "    `calcs`.`resAxialForceStrength`,"
+                        + "    `calcs`.`resAxialCompessiveForceLocal`,"
+                        + "    `calcs`.`resFlexibility`,"
+                        + "    `calcs`.`resAxialCompessiveForce`,"
+                        + "    `calcs`.`resAxialForceElasticity`,"
+                        + "    `calcs`.`resAxialForcePermissible`,"
+                        + "    `calcs`.`resStrengthConditionsThrust`,"
+                        + "    `calcs`.`resBendingMomentStrength`,"
+                        + "    `calcs`.`resBendingMomentElasticity`,"
+                        + "    `calcs`.`resBendingMomentPermissible`,"
+                        + "    `calcs`.`resStrengthConditionsBendingMoment`,"
+                        + "    `calcs`.`resShearForceStrength`,"
+                        + "    `calcs`.`resShearForceElasticity`,"
+                        + "    `calcs`.`resShearForcePermissible`,"
+                        + "    `calcs`.`resStrengthConditionsShearForce`"
+                        + " FROM `calculator`.`calcs` INNER JOIN `calculator`.`materials` ON `calcs`.`materials_id` = `materials`.`id`"
+                        + " WHERE calcs.id = ?";
+               PreparedStatement pstat = conn.prepareStatement(query);
+               pstat.setInt(1, id_open);
+               ResultSet result = pstat.executeQuery();
+               
+               result.next();
+               
+                setId(result.getInt("id"));
+                setDate(result.getDate("date"));
+                setMaterial(result.getString("matname"));
+                setIntPressure(result.getFloat("intPressure"));
+                setTemp(result.getInt("temp"));
+                setTempT(result.getFloat("tempT"));
+                setDiam(result.getInt("diam"));
+                setThickness(result.getInt("thickness"));
+                setCorrosion(result.getFloat("corrosion"));
+                setMinusTolerance(result.getFloat("minusTolerance"));
+                setTechno(result.getFloat("techno"));
+                setAddThickness(result.getFloat("addThickness"));
+                setElasticity(result.getFloat("elasticity"));
+                setWeld(result.getFloat("weld"));
+                setKoef(result.getFloat("koef"));
+                setLength(result.getFloat("length"));
+                setLength_pr(result.getFloat("length_pr"));
+                setBending(result.getFloat("bending"));
+                setShift(result.getFloat("shift"));
+                setForce(result.getFloat("force"));
+                setResThickness(result.getFloat("resThickness"));
+                setResIntPressure(result.getFloat("resIntPressure"));
+                setResGreaterPressure(result.getString("resGreaterPressure"));
+                setResGreaterThickness(result.getString("resGreaterThickness"));
+                setResAxialForceStrength(result.getFloat("resAxialForceStrength"));
+                setResAxialCompessiveForceLocal(result.getFloat("resAxialCompessiveForceLocal"));
+                setResFlexibility(result.getFloat("resFlexibility"));
+                setResAxialCompessiveForce(result.getFloat("resAxialCompessiveForce"));
+                setResAxialForceElasticity(result.getFloat("resAxialForceElasticity"));
+                setResAxialForcePermissible(result.getFloat("resAxialForcePermissible"));
+                setResStrengthConditionsThrust(result.getString("resStrengthConditionsThrust"));
+                setResBendingMomentStrength(result.getFloat("resBendingMomentStrength"));
+                setResBendingMomentElasticity(result.getFloat("resBendingMomentElasticity"));
+                setResBendingMomentPermissible(result.getFloat("resBendingMomentPermissible"));
+                setResStrengthConditionsBendingMoment(result.getString("resStrengthConditionsBendingMoment"));
+                setResShearForceStrength(result.getFloat("resShearForceStrength"));
+                setResShearForceElasticity(result.getFloat("resShearForceElasticity"));
+                setResShearForcePermissible(result.getFloat("resShearForcePermissible"));
+                setResStrengthConditionsShearForce(result.getString("resStrengthConditionsShearForce"));
+               
+                }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+       
+    }
+    
+   public void exportWord() throws Docx4JException, JAXBException{
+       
+                org.docx4j.wml.ObjectFactory foo = Context.getWmlObjectFactory();
+
+		String inputfilepath = "d:\\Java\\Задания\\Калькулятор расчетов\\export.docx";
+
+		boolean save = true;
+		String outputfilepath = "d:\\Java\\Задания\\Калькулятор расчетов\\out_word_"+date.toString()+".docx";
+
+		WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage
+				.load(new java.io.File(inputfilepath));
+		MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
+
+		HashMap<String, String> mappings = new HashMap<>();
+                mappings.put("c4", material);
+		mappings.put("press",intPressure.toString());
+		mappings.put("temp", temp.toString());
+                mappings.put("diam", diam.toString());
+                mappings.put("thikness", thickness.toString());
+                mappings.put("c6", tempT.toString());
+                mappings.put("module", elasticity.toString());
+                mappings.put("c1", corrosion.toString());
+                mappings.put("c2", minusTolerance.toString());
+                mappings.put("c3", techno.toString());
+                mappings.put("c7", addThickness.toString());
+                mappings.put("c8", weld.toString());
+                mappings.put("c9", koef.toString());
+                mappings.put("c10", length.toString());
+                mappings.put("c11", length_pr.toString());
+                mappings.put("c12", resThickness.toString());
+                mappings.put("c13", resIntPressure.toString());
+                mappings.put("c14", resGreaterPressure);
+                Float c15 = resThickness+addThickness;
+                mappings.put("c15", c15.toString());
+                mappings.put("c16", resGreaterThickness);
+                mappings.put("c20", resAxialForceStrength.toString());
+                mappings.put("c21", resAxialCompessiveForceLocal.toString());
+                mappings.put("c22", resFlexibility.toString());
+                Float param = length/diam;
+                if(param<10){
+                  mappings.put("c23", resAxialCompessiveForce.toString());
+                  mappings.put("c24","="+param.toString());
+                  mappings.put("c25","");
+                  mappings.put("c26","");
+                }
+                else{
+                  mappings.put("c23", "");
+                  mappings.put("c24","");
+                  mappings.put("c25",resAxialCompessiveForce.toString());
+                  mappings.put("c26","="+param.toString());  
+                }
+                mappings.put("c27",resAxialForceElasticity.toString()); 
+                mappings.put("c28",resAxialForcePermissible.toString()); 
+                mappings.put("c29",bending.toString());
+                mappings.put("c30",shift.toString());
+                mappings.put("c31",force.toString());
+                mappings.put("c33",resStrengthConditionsThrust);
+                mappings.put("c34",resBendingMomentStrength.toString());
+                mappings.put("c35",resBendingMomentElasticity.toString());
+                mappings.put("c36",resBendingMomentPermissible.toString());
+                mappings.put("c37",resShearForceStrength.toString());
+                mappings.put("c38",resShearForceElasticity.toString());
+                mappings.put("c39",resShearForcePermissible.toString());
+		
+
+		// Approach 1 (from 3.0.0; faster if you haven't yet caused unmarshalling to occur):
+		
+			documentPart.variableReplace(mappings);
+		
+/*		// Approach 2 (original)
+		
+			// unmarshallFromTemplate requires string input
+			String xml = XmlUtils.marshaltoString(documentPart.getJaxbElement(), true);
+			// Do it...
+			Object obj = XmlUtils.unmarshallFromTemplate(xml, mappings);
+			// Inject result into docx
+			documentPart.setJaxbElement((Document) obj);
+*/
+			
+
+		// Save it
+		if (save) {
+			SaveToZipFile saver = new SaveToZipFile(wordMLPackage);
+			saver.save(outputfilepath);
+                        
+                        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Выгрузка завершена", "Файл сохранен : "+outputfilepath);
+                        FacesContext.getCurrentInstance().addMessage(null, msg);
+		} else {
+			System.out.println(XmlUtils.marshaltoString(documentPart.getJaxbElement(), true,
+					true));
+		}
+		
+	}
     
     public void changeTemp(){
             
@@ -633,6 +843,55 @@ public class CalcDAO implements Serializable {
                         + resShearForceElasticity+","
                         + resShearForcePermissible+","
                         + "'"+resStrengthConditionsShearForce+"')";
+                
+                String query2 = "UPDATE `calculator`.`calcs`"
+                            + " SET"
+                            + "`materials_id` = "+material_id+","
+                            + "`intPressure` = "+intPressure+","
+                            + "`temp` = "+temp+" ,"
+                            + "`tempT` = "+tempT+" ,"
+                            + "`diam` = "+diam+" ,"
+                            + "`thickness` = "+thickness+" ,"
+                            + "`corrosion` = "+corrosion+" ,"
+                            + "`minusTolerance` = "+minusTolerance+" ,"
+                            + "`techno` = "+techno+" ,"
+                            + "`addThickness` = "+addThickness+" ,"
+                            + "`elasticity` = "+elasticity+" ,"
+                            + "`weld` = "+weld+" ,"
+                            + "`koef` = "+koef+" ,"
+                            + "`length` = "+length+" ,"
+                            + "`length_pr` = "+length_pr+" ,"
+                            + "`bending` = "+bending+" ,"
+                            + "`shift` = "+shift+" ,"
+                            + "`force` = "+force+" ,"
+                            + "`resThickness` = "+resThickness+" ,"
+                            + "`resIntPressure` = "+resIntPressure+" ,"
+                            + "`resGreaterPressure` = '"+resGreaterPressure+"' ,"
+                            + "`resGreaterThickness` = '"+resGreaterThickness+"' ,"
+                            + "`resAxialForceStrength` = "+resAxialForceStrength+" ,"
+                            + "`resAxialCompessiveForceLocal` = "+resAxialCompessiveForceLocal+" ,"
+                            + "`resFlexibility` = "+resFlexibility+" ,"
+                            + "`resAxialCompessiveForce` = "+resAxialCompessiveForce+" ,"
+                            + "`resAxialForceElasticity` = "+resAxialForceElasticity+" ,"
+                            + "`resAxialForcePermissible` = "+resAxialForcePermissible+" ,"
+                            + "`resStrengthConditionsThrust` = '"+resStrengthConditionsThrust+"' ,"
+                            + "`resBendingMomentStrength` = "+resBendingMomentStrength+" ,"
+                            + "`resBendingMomentElasticity` = "+resBendingMomentElasticity+" ,"
+                            + "`resBendingMomentPermissible` = "+resBendingMomentPermissible+" ,"
+                            + "`resStrengthConditionsBendingMoment` = '"+resStrengthConditionsBendingMoment+"' ,"
+                            + "`resShearForceStrength` = "+resShearForceStrength+" ,"
+                            + "`resShearForceElasticity` = "+resShearForceElasticity+" ,"
+                            + "`resShearForcePermissible` = "+resShearForcePermissible+" ,"
+                            + "`resStrengthConditionsShearForce` = '"+resStrengthConditionsShearForce+"' "
+                            + "WHERE `id` = "+id+";";
+                
+                
+                
+                if(!(id==null)){
+                    query = query2;
+                    
+                }
+                
                 PreparedStatement stat2 = conn.prepareStatement(query);
 
                         stat2.executeUpdate();
@@ -1219,6 +1478,48 @@ public class CalcDAO implements Serializable {
      */
     public void setResAxialCompessiveForce(Float resAxialCompessiveForce) {
         this.resAxialCompessiveForce = resAxialCompessiveForce;
+    }
+
+    /**
+     * @return the id_open
+     */
+    public Integer getId_open() {
+        return id_open;
+    }
+
+    /**
+     * @param id_open the id_open to set
+     */
+    public void setId_open(Integer id_open) {
+        this.id_open = id_open;
+    }
+
+    /**
+     * @return the id
+     */
+    public Integer getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the date
+     */
+    public Date getDate() {
+        return date;
+    }
+
+    /**
+     * @param date the date to set
+     */
+    public void setDate(Date date) {
+        this.date = date;
     }
 
 }

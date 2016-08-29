@@ -29,6 +29,7 @@ public class CalcsBean implements Serializable {
 
     //private LazyDataModel<CalcProfile> lazyModel;
     private List<CalcProfile> calcs;
+    private CalcProfile selectedCalc;
 
     @ManagedProperty("#{calcDAO}")
     private CalcDAO profile;
@@ -56,6 +57,20 @@ public class CalcsBean implements Serializable {
      */
     public List<CalcProfile> getCalcs() {
         return calcs;
+    }
+
+    /**
+     * @return the selectedCalc
+     */
+    public CalcProfile getSelectedCalc() {
+        return selectedCalc;
+    }
+
+    /**
+     * @param selectedCalc the selectedCalc to set
+     */
+    public void setSelectedCalc(CalcProfile selectedCalc) {
+        this.selectedCalc = selectedCalc;
     }
 
 }

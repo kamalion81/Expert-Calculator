@@ -13,52 +13,64 @@
     <h:body>
         
         <h:form id="form">
-            <p:growl id="growl" showDetail="false"/>
+            <p:growl id="growl" showDetail="true"/>
             <p:button outcome="MainMenu" value="Назад в меню" icon="fa fa-fw fa-arrow-left"/>
-            <br></br>
-            <br></br>
-            <p:dataTable id="usersDt" var="user" value="#{usersBean.users}" editable="true" editMode="cell"
-                         paginator="true" rows="20"  selection="#{usersBean.selectedUser}" rowKey="#{user.id}">
+            
+            <p:dataTable  style="margin-top: 10px" id="usersDt" var="user" value="#{usersBean.users}" editable="true" 
+                          paginator="true" rows="20" selectionMode="single" selection="#{usersBean.selectedUser}" rowKey="#{user.id}">
 
-                    <f:facet name="header">
-                        Список пользователей
-                        <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-user-plus" label="Новый пользователь" onclick="PF('dlg').show();"/>
-                        <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-times-circle" update=":form:usersDt :form:growl" actionListener="#{usersBean.deleteUsers}" label="Удалить пользователей"/>
-                        <p:commandButton style="width:32px;float:left;height: 20px" icon="fa fa-fw fa-exchange" onclick="PF('dlg2').show();" label="Сменить пароль"/>
-                    </f:facet>
+                <f:facet name="header">
+                    Список пользователей
+                </f:facet>
+
+                <f:facet name="header">
+                    <p:toolbar style="margin-top: 10px">
+                        <f:facet name="left">
+                            <p:commandButton process="usersDt" value="Создать" icon="fa fa-fw fa-user-plus" label="Новый пользователь" onclick="PF('dlg').show();"/>
+                            <p:commandButton process="usersDt" value="Удалить"  icon="fa fa-fw fa-times-circle"  update=":form:usersDt :form:growl" actionListener="#{usersBean.deleteUsers}"  label="Удалить пользователей"/>
+                            <p:commandButton value="Сменить пароль"  icon="fa fa-fw fa-exchange" onclick="PF('dlg2').show();" label="Сменить пароль"/>
+                            <p:commandButton process="usersDt" update=":form:userDetail" value="Редактировать" icon="fa fa-fw fa-edit" label="Редактировать" onclick="PF('dlg3').show();"/>
+                        </f:facet>
+                    </p:toolbar>
+                </f:facet>
+                
+                
                     
                     
 
-                    <p:ajax event="rowEdit" process="@this" listener="#{usersBean.onRowEdit}" update=":form:growl" />
-                    <p:ajax event="rowEditCancel" process="@this" listener="#{usersBean.onRowCancel}" update=":form:growl" />
-                    <p:ajax event="cellEdit" process="@this" listener="#{usersBean.onCellEdit}" update=":form:growl" />
+                    <!--<p:ajax event="rowEdit" process="@this" listener="{usersBean.onRowEdit}" update=":form:growl" />
+                    <p:ajax event="rowEditCancel" process="@this" listener="{usersBean.onRowCancel}" update=":form:growl" />
+                    <p:ajax event="cellEdit" process="@this" listener="{usersBean.onCellEdit}" update=":form:growl" />-->
 
                     <p:column headerText="Код" rendered="false">
                         <h:outputText value="#{user.id}"/>
                     </p:column>
                     
-                    <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                    <!--<p:column selectionMode="single" style="width:16px;text-align:center"/>-->
                     
-                    <p:column style="width:32px">
+                    <!--<p:column style="width:32px">
                         <p:rowEditor/>
-                    </p:column>
+                    </p:column>-->
                     
                     <p:column headerText="Пользователь">
-                        <p:cellEditor >
-                            <f:facet name="output"><h:outputText value="#{user.username}"/></f:facet>
-                            <f:facet name="input"><p:inputText value="#{user.username}" style="width:100%" label="Пользователь"/></f:facet>
-                        </p:cellEditor>
+                        <!--<p:cellEditor >-->
+                            
+                            <h:outputText value="#{user.username}"/>
+                            <!--<f:facet name="output"><h:outputText value="{user.username}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="{user.username}" style="width:100%" label="Пользователь"/></f:facet>
+                        </p:cellEditor>-->
                     </p:column>
 
                     <p:column headerText="Роль">
-                        <p:cellEditor>
-                            <f:facet name="output"><h:outputText value="#{user.rolename}"/></f:facet>
+                        <h:outputText value="#{user.rolename}"/>
+                        <!--<p:cellEditor>
+                            <f:facet name="output"><h:outputText value="{user.rolename}"/></f:facet>
                             <f:facet name="input">
-                                <h:selectOneMenu required="false" value="#{user.rolename}" style="width:100%">
-                                    <f:selectItems value="#{userDAO.roles}" var="roles" itemLabel="#{roles}" itemValue="#{roles}" />
+                                <h:selectOneMenu required="false" value="{user.rolename}" style="width:100%">
+                                    <f:selectItems value="{userDAO.roles}" var="roles" itemLabel="{roles}" itemValue="{roles}" />
                                 </h:selectOneMenu>
                             </f:facet>
-                        </p:cellEditor>
+                        </p:cellEditor>-->
                     </p:column>
 
                     
@@ -84,7 +96,7 @@
                     <p:password value="#{userDAO.pass_again}" required="false" label="Повторение пароля"/>
 
                     <f:facet name="footer">
-                        <p:commandButton  value="Сохранить" update=":form:growl :form:usersDt" action="#{usersBean.saveUser}"/>
+                         <p:commandButton  value="Сохранить" update=":form:growl :form:usersDt" actionListener="#{usersBean.saveUser}"/>
                     </f:facet>  
                 </h:panelGrid>
             </p:dialog>
@@ -100,10 +112,28 @@
                     <h:outputLabel for="pwd2" value="Повтор пароля: " />
                     <p:password id="pwd2" value="#{userDAO.newPass_again}" label="Повтор пароля"/>
                     
-                    <p:commandButton value="Применить" ajax="false" update="growl" action="#{usersBean.savePass}"/>
+                    <p:commandButton value="Применить" update=":form:growl" actionListener="#{usersBean.savePass}"/>
  
                 </h:panelGrid>
             </p:dialog>
+            
+            <p:dialog header="Редактировать пользователя" widgetVar="dlg3" resizable="false">
+                    <h:panelGrid  id="userDetail" columns="2" cellpadding="5">
+                        <h:outputLabel for="username_new" value="ФИО пользователя:" />
+                        <p:inputText id="username_new" value="#{usersBean.selectedUser.username}"/>
+
+                        <h:outputLabel value="Роль:" />
+
+                        <h:selectOneMenu required="false" value="#{usersBean.selectedUser.rolename}" style="width:100%">
+                            <f:selectItems value="#{userDAO.roles}" var="roles" itemLabel="#{roles}" itemValue="#{roles}" />
+                        </h:selectOneMenu>
+
+                        <f:facet name="footer">
+                            <p:commandButton  value="Применить" update=":form:growl :form:usersDt :form:userDetail" actionListener="#{usersBean.editUser}"/>
+                        </f:facet>  
+                    </h:panelGrid>
+            </p:dialog>
+            
             
             
             
@@ -111,4 +141,3 @@
         </h:form>
     </h:body>
 </html>
-

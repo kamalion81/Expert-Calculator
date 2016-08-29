@@ -19,7 +19,7 @@ import org.primefaces.event.FlowEvent;
 @ViewScoped
 public class CalcWizardBean implements Serializable {
     
-
+    
     private boolean skip;
     
     @ManagedProperty("#{calcDAO}")
@@ -29,6 +29,12 @@ public class CalcWizardBean implements Serializable {
     private  MaterialDAO mat;
 
     public CalcDAO getCalc() {
+        
+        if(!(calc.getId_open()==null)&!skip){
+            calc.fillCalc();
+            skip = true;
+            
+        }
         return calc;
     }
     

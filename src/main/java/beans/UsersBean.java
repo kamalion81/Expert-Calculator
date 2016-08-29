@@ -30,6 +30,8 @@ public class UsersBean implements Serializable{
     @PostConstruct
     public void init() {
         users = profile.getUsers();
+        selectedUser = users.get(0);
+        
 //        lazyModel = new LazyUserDataModel(profile.getUsers());
     }
     
@@ -49,6 +51,13 @@ public class UsersBean implements Serializable{
         FacesMessage msg = new FacesMessage("Данные сохранены","Пользователь "+selectedUser.getUsername());
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
+    
+    public void editUser() {
+        profile.editUser(selectedUser);
+        FacesMessage msg = new FacesMessage("Данные сохранены","Пользователь "+selectedUser.getUsername());
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
+    
 
     public void onRowCancel(RowEditEvent event) {
         FacesMessage msg = new FacesMessage("Редактирование отменено","Пользователь "+selectedUser.getUsername());

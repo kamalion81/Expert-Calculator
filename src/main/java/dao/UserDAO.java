@@ -28,7 +28,9 @@ import org.primefaces.event.RowEditEvent;
 public class UserDAO implements Serializable {
 
     private String username;
+    private String username_new;
     private String rolename;
+    private String rolename_new;
     private String pass;
     private String pass_again;
     private String oldPass;
@@ -429,6 +431,34 @@ public class UserDAO implements Serializable {
      */
     public void setNewPass_again(String newPass_again) {
         this.newPass_again = newPass_again;
+    }
+
+    /**
+     * @return the rolename_new
+     */
+    public String getRolename_new() {
+        return rolename_new;
+    }
+
+    /**
+     * @param rolename_new the rolename_new to set
+     */
+    public void setRolename_new(String rolename_new) {
+        this.rolename_new = rolename_new;
+    }
+
+    /**
+     * @return the username_new
+     */
+    public String getUsername_new() {
+        return username_new;
+    }
+
+    /**
+     * @param username_new the username_new to set
+     */
+    public void setUsername_new(String username_new) {
+        this.username_new = username_new;
     }
 
 }
