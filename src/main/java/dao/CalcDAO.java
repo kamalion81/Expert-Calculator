@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import dao.MaterialDAO;
+import java.io.File;
 import java.math.MathContext;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -50,6 +51,7 @@ public class CalcDAO implements Serializable {
     
     private Integer id;
     private Date date;
+    private String name;
     //Поля входящих данных
     private String material;
     private Integer id_open;
@@ -220,6 +222,7 @@ public class CalcDAO implements Serializable {
                
                 setId(result.getInt("id"));
                 setDate(result.getDate("date"));
+                setName(result.getString("name"));
                 setMaterial(result.getString("matname"));
                 setIntPressure(result.getFloat("intPressure"));
                 setTemp(result.getInt("temp"));
@@ -240,23 +243,23 @@ public class CalcDAO implements Serializable {
                 setForce(result.getFloat("force"));
                 setResThickness(result.getFloat("resThickness"));
                 setResIntPressure(result.getFloat("resIntPressure"));
-                setResGreaterPressure(result.getString("resGreaterPressure"));
-                setResGreaterThickness(result.getString("resGreaterThickness"));
+                setResGreaterPressure(result.getString("resGreaterPressure").matches("null")?"":result.getString("resGreaterPressure"));
+                setResGreaterThickness(result.getString("resGreaterThickness").matches("null")?"":result.getString("resGreaterThickness"));
                 setResAxialForceStrength(result.getFloat("resAxialForceStrength"));
                 setResAxialCompessiveForceLocal(result.getFloat("resAxialCompessiveForceLocal"));
                 setResFlexibility(result.getFloat("resFlexibility"));
                 setResAxialCompessiveForce(result.getFloat("resAxialCompessiveForce"));
                 setResAxialForceElasticity(result.getFloat("resAxialForceElasticity"));
                 setResAxialForcePermissible(result.getFloat("resAxialForcePermissible"));
-                setResStrengthConditionsThrust(result.getString("resStrengthConditionsThrust"));
+                setResStrengthConditionsThrust(result.getString("resStrengthConditionsThrust").matches("null")?"":result.getString("resStrengthConditionsThrust"));
                 setResBendingMomentStrength(result.getFloat("resBendingMomentStrength"));
                 setResBendingMomentElasticity(result.getFloat("resBendingMomentElasticity"));
                 setResBendingMomentPermissible(result.getFloat("resBendingMomentPermissible"));
-                setResStrengthConditionsBendingMoment(result.getString("resStrengthConditionsBendingMoment"));
+                setResStrengthConditionsBendingMoment(result.getString("resStrengthConditionsBendingMoment").matches("null")?"":result.getString("resStrengthConditionsBendingMoment"));
                 setResShearForceStrength(result.getFloat("resShearForceStrength"));
                 setResShearForceElasticity(result.getFloat("resShearForceElasticity"));
                 setResShearForcePermissible(result.getFloat("resShearForcePermissible"));
-                setResStrengthConditionsShearForce(result.getString("resStrengthConditionsShearForce"));
+                setResStrengthConditionsShearForce(result.getString("resStrengthConditionsShearForce").matches("null")?"":result.getString("resStrengthConditionsShearForce"));
                
                 }
         } catch (SQLException ex) {
@@ -266,76 +269,79 @@ public class CalcDAO implements Serializable {
        
     }
     
-   public void exportWord() throws Docx4JException, JAXBException{
-       
-                org.docx4j.wml.ObjectFactory foo = Context.getWmlObjectFactory();
+   public void exportWord() throws Docx4JException, JAXBException {
+        
+        org.docx4j.wml.ObjectFactory foo = Context.getWmlObjectFactory();
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("export.docx").getFile());
 
-		String inputfilepath = "d:\\Java\\Задания\\Калькулятор расчетов\\export.docx";
+        //String inputfilepath = "d:\\Java\\Задания\\Калькулятор расчетов\\export.docx";
+        boolean save = true;
+        String property = System.getProperty("user.home") + "\\Documents";
+        String outputfilepath = property + "\\" + name + "_" + date.toString() + ".docx";
+//		String outputfilepath = "d:\\Java\\Задания\\Калькулятор расчетов\\"+name+"_"+date.toString()+".docx";
 
-		boolean save = true;
-		String outputfilepath = "d:\\Java\\Задания\\Калькулятор расчетов\\out_word_"+date.toString()+".docx";
+//		WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage
+//				.load(new File(inputfilepath));
+        WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage
+                .load(file);
+        
+        MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
+        
+        HashMap<String, String> mappings = new HashMap<>();
+        mappings.put("c4", material);
+        mappings.put("press", intPressure.toString());
+        mappings.put("temp", temp.toString());
+        mappings.put("diam", diam.toString());
+        mappings.put("thikness", thickness.toString());
+        mappings.put("c6", tempT.toString());
+        mappings.put("module", elasticity.toString());
+        mappings.put("c1", corrosion.toString());
+        mappings.put("c2", minusTolerance.toString());
+        mappings.put("c3", techno.toString());
+        mappings.put("c7", addThickness.toString());
+        mappings.put("c8", weld.toString());
+        mappings.put("c9", koef.toString());
+        mappings.put("c10", length.toString());
+        mappings.put("c11", length_pr.toString());
+        mappings.put("c12", resThickness.toString());
+        mappings.put("c13", resIntPressure.toString());
+        mappings.put("c14", resGreaterPressure);
+        Float c15 = resThickness + addThickness;
+        mappings.put("c15", c15.toString());
+        mappings.put("c16", resGreaterThickness);
+        mappings.put("c20", resAxialForceStrength.toString());
+        mappings.put("c21", resAxialCompessiveForceLocal.toString());
+        mappings.put("c22", resFlexibility.toString());
+        Float param = length / diam;
+        if (param < 10) {
+            mappings.put("c23", resAxialCompessiveForce.toString());
+            mappings.put("c24", "=" + param.toString());
+            mappings.put("c25", "");
+            mappings.put("c26", "");
+        } else {
+            mappings.put("c23", "");
+            mappings.put("c24", "");
+            mappings.put("c25", resAxialCompessiveForce.toString());
+            mappings.put("c26", "=" + param.toString());            
+        }
+        mappings.put("c27", resAxialForceElasticity.toString());        
+        mappings.put("c28", resAxialForcePermissible.toString());        
+        mappings.put("c29", bending.toString());
+        mappings.put("c30", shift.toString());
+        mappings.put("c31", force.toString());
+        mappings.put("c33", resStrengthConditionsThrust);
+        mappings.put("c34", resBendingMomentStrength.toString());
+        mappings.put("c35", resBendingMomentElasticity.toString());
+        mappings.put("c36", resBendingMomentPermissible.toString());
+        mappings.put("c37", resShearForceStrength.toString());
+        mappings.put("c38", resShearForceElasticity.toString());
+        mappings.put("c39", resShearForcePermissible.toString());
 
-		WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage
-				.load(new java.io.File(inputfilepath));
-		MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
+        // Approach 1 (from 3.0.0; faster if you haven't yet caused unmarshalling to occur):
+        documentPart.variableReplace(mappings);
 
-		HashMap<String, String> mappings = new HashMap<>();
-                mappings.put("c4", material);
-		mappings.put("press",intPressure.toString());
-		mappings.put("temp", temp.toString());
-                mappings.put("diam", diam.toString());
-                mappings.put("thikness", thickness.toString());
-                mappings.put("c6", tempT.toString());
-                mappings.put("module", elasticity.toString());
-                mappings.put("c1", corrosion.toString());
-                mappings.put("c2", minusTolerance.toString());
-                mappings.put("c3", techno.toString());
-                mappings.put("c7", addThickness.toString());
-                mappings.put("c8", weld.toString());
-                mappings.put("c9", koef.toString());
-                mappings.put("c10", length.toString());
-                mappings.put("c11", length_pr.toString());
-                mappings.put("c12", resThickness.toString());
-                mappings.put("c13", resIntPressure.toString());
-                mappings.put("c14", resGreaterPressure);
-                Float c15 = resThickness+addThickness;
-                mappings.put("c15", c15.toString());
-                mappings.put("c16", resGreaterThickness);
-                mappings.put("c20", resAxialForceStrength.toString());
-                mappings.put("c21", resAxialCompessiveForceLocal.toString());
-                mappings.put("c22", resFlexibility.toString());
-                Float param = length/diam;
-                if(param<10){
-                  mappings.put("c23", resAxialCompessiveForce.toString());
-                  mappings.put("c24","="+param.toString());
-                  mappings.put("c25","");
-                  mappings.put("c26","");
-                }
-                else{
-                  mappings.put("c23", "");
-                  mappings.put("c24","");
-                  mappings.put("c25",resAxialCompessiveForce.toString());
-                  mappings.put("c26","="+param.toString());  
-                }
-                mappings.put("c27",resAxialForceElasticity.toString()); 
-                mappings.put("c28",resAxialForcePermissible.toString()); 
-                mappings.put("c29",bending.toString());
-                mappings.put("c30",shift.toString());
-                mappings.put("c31",force.toString());
-                mappings.put("c33",resStrengthConditionsThrust);
-                mappings.put("c34",resBendingMomentStrength.toString());
-                mappings.put("c35",resBendingMomentElasticity.toString());
-                mappings.put("c36",resBendingMomentPermissible.toString());
-                mappings.put("c37",resShearForceStrength.toString());
-                mappings.put("c38",resShearForceElasticity.toString());
-                mappings.put("c39",resShearForcePermissible.toString());
-		
-
-		// Approach 1 (from 3.0.0; faster if you haven't yet caused unmarshalling to occur):
-		
-			documentPart.variableReplace(mappings);
-		
-/*		// Approach 2 (original)
+        /*		// Approach 2 (original)
 		
 			// unmarshallFromTemplate requires string input
 			String xml = XmlUtils.marshaltoString(documentPart.getJaxbElement(), true);
@@ -343,29 +349,26 @@ public class CalcDAO implements Serializable {
 			Object obj = XmlUtils.unmarshallFromTemplate(xml, mappings);
 			// Inject result into docx
 			documentPart.setJaxbElement((Document) obj);
-*/
-			
-
-		// Save it
-		if (save) {
-			SaveToZipFile saver = new SaveToZipFile(wordMLPackage);
-			saver.save(outputfilepath);
-                        
-                        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Выгрузка завершена", "Файл сохранен : "+outputfilepath);
-                        FacesContext.getCurrentInstance().addMessage(null, msg);
-		} else {
-			System.out.println(XmlUtils.marshaltoString(documentPart.getJaxbElement(), true,
-					true));
-		}
-		
-	}
+         */
+        // Save it
+        if (save) {
+            SaveToZipFile saver = new SaveToZipFile(wordMLPackage);
+            saver.save(outputfilepath);
+            
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Выгрузка завершена", "Файл сохранен : " + outputfilepath);
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+        } else {
+            System.out.println(XmlUtils.marshaltoString(documentPart.getJaxbElement(), true,
+                    true));
+        }
+        
+    }
     
     public void changeTemp(){
             
             if(!(thickness==null)){
             changeThickness();    
             }
-            
             
             if(!(temp == null)){
                 writeModule();
@@ -804,7 +807,7 @@ public class CalcDAO implements Serializable {
                         + "`resShearForcePermissible`,"
                         + "`resStrengthConditionsShearForce`)"
                         + "VALUES"
-                        + "('Расчет',"
+                        + "('"+name+"',"
                         + "'"+data+"',"
                         + material_id+","
                         + intPressure+","
@@ -846,6 +849,7 @@ public class CalcDAO implements Serializable {
                 
                 String query2 = "UPDATE `calculator`.`calcs`"
                             + " SET"
+                            + "name = "+name+","
                             + "`materials_id` = "+material_id+","
                             + "`intPressure` = "+intPressure+","
                             + "`temp` = "+temp+" ,"
@@ -1520,6 +1524,20 @@ public class CalcDAO implements Serializable {
      */
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

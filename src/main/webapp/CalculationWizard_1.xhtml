@@ -43,6 +43,17 @@
                                 <p:column colspan="1">Величина</p:column>
                             </p:row>
                         </f:facet>
+                        
+                        <p:row>
+                            <p:column colspan="2">Наименование</p:column>
+
+                            <p:column   style="background: blanchedalmond">
+                                <p:inputText size="40" id="name" value="#{calcWizardBean.calc.name}" label="Наименование">
+                                    <p:ajax event="change" listener="#{calcWizardBean.calc.writeResults}" update="results1 results2 results3" />
+                                </p:inputText>
+                                <p:message for="name"/>
+                            </p:column>
+                        </p:row>
 
                         <p:row>
                             <p:column>Материал обечайки</p:column>
