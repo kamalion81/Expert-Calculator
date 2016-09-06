@@ -215,6 +215,7 @@ public class CalcDAO implements Serializable {
                pstat.setInt(1, id_open);
                ResultSet result = pstat.executeQuery();
                
+               
                result.next();
                
                 setId(result.getInt("id"));
