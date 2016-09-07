@@ -4,6 +4,7 @@ package dao;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.io.File;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,6 +32,9 @@ import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import profiles.CalcProfile;
 import java.util.Date;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 @ManagedBean
 @ApplicationScoped
@@ -402,21 +406,58 @@ public class CalcDAO implements Serializable {
                     PreparedStatement pstat = conn.prepareStatement("SELECT id FROM calculator.materials WHERE matname = ?");
                     pstat.setString(1, material);
                     ResultSet res = pstat.executeQuery();
-
                     res.next();
                     int material_id = res.getInt("id");
+                    
                     PreparedStatement stat = conn.prepareStatement("SELECT value FROM calculator.dopuskaemoe_napryazhenie WHERE material_id = ? AND temp = ? AND (?<= thickness_max AND ?>= thickness_min)");
                     stat.setInt(1, material_id);
                     stat.setInt(2, getTemp());
                     stat.setInt(3, getThickness());
                     stat.setInt(4, getThickness());
                     ResultSet res2 = stat.executeQuery();
-                    res2.next();
+                    //res2.next();
                     
-                    BigDecimal x = new BigDecimal(res2.getFloat("value"));
-                    x = x.setScale(2, BigDecimal.ROUND_HALF_UP);
+//                    BigDecimal x = new BigDecimal(res2.getFloat("value"));
+//                    x = x.setScale(2, BigDecimal.ROUND_HALF_UP);
+
+                    //Float value = res2.getFloat("value");
+                    Float value = null;
                     
-                    setTempT(x.floatValue());
+                    if(!res2.next()){
+                        PreparedStatement pstat2 = conn.prepareStatement("SELECT temp,value FROM calculator.dopuskaemoe_napryazhenie WHERE material_id = ? AND (?<= thickness_max AND ?>= thickness_min)");
+                        
+                        pstat2.setInt(1, material_id);
+                        pstat2.setInt(2, getThickness());
+                        pstat2.setInt(3, getThickness());
+                        
+                        ResultSet res3 = pstat2.executeQuery();
+                        
+                        TreeMap map = new TreeMap();
+                        
+                        while(res3.next()){
+                            map.put(res3.getInt("temp"),res3.getFloat("value"));
+                        }
+                        
+                        Map.Entry top_value = map.ceilingEntry(temp);
+                        Map.Entry bottom_value = map.floorEntry(temp);
+                        
+                        Float sigma2 = (Float) top_value.getValue();
+                        Float sigma1 = (Float) bottom_value.getValue();
+                        
+                        Integer top_temp = (Integer) map.ceilingKey(temp);
+                        Integer bottom_temp = (Integer) map.floorKey(temp);
+                        Float part1 = null;
+                        part1 = (float)(temp-bottom_temp)/(top_temp-bottom_temp)*(sigma2-sigma1);
+                        
+                        value = sigma1+part1;
+                        //value = calcFreeTempT();
+                        
+                    }else{
+                        value = res2.getFloat("value");
+                    }
+                    
+                    //setTempT(x.floatValue());
+                    setTempT(value);
 
                     conn.commit();
                     committed = true;
@@ -436,6 +477,7 @@ public class CalcDAO implements Serializable {
         writeResults();
 
     }
+    
     
     public void changeC(){
         
